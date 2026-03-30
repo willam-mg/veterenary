@@ -130,6 +130,127 @@ Modo headed:
 npx.cmd playwright test --headed
 ```
 
+## CI/CD
+
+Este proyecto ya incluye integración para GitHub Actions y Jenkins.
+
+### GitHub Actions
+
+Los workflows de GitHub Actions viven en la raíz del repositorio:
+
+- `.github/workflows/automation-ci.yml`
+- `.github/workflows/automation-full.yml`
+
+Esto es obligatorio porque GitHub no detecta workflows dentro de `automation/.github/workflows`.
+
+#### `automation-ci.yml`
+
+Se ejecuta en:
+
+- `push`
+- `pull_request`
+- `workflow_dispatch`
+
+Objetivo:
+
+- correr `smoke`
+- correr `api`
+- subir artifacts de Playwright
+- subir resultados de Allure
+
+Este workflow usa `working-directory: automation`.
+
+#### `automation-full.yml`
+
+Se ejecuta en:
+
+- `schedule`
+- `workflow_dispatch`
+
+Objetivo:
+
+- correr `e2e`
+- correr `regression`
+- permitir ejecución manual de `e2e`, `regression` o `all`
+
+#### Variables recomendadas en GitHub
+
+Configura estas variables y secretos en el repositorio:
+
+Variables:
+
+- `WEB_BASE_URL`
+- `API_BASE_URL`
+
+Secrets:
+
+- `DEMO_USER_EMAIL`
+- `DEMO_USER_PASSWORD`
+
+Si no se configuran, los workflows usan estos defaults:
+
+- `http://localhost:4200`
+- `http://localhost:8000/api/v1`
+- `admin@vetdemo.test`
+- `password`
+
+Eso sirve para un entorno self-hosted o una infraestructura donde esas URLs existan. En GitHub-hosted runners normalmente debes apuntar a ambientes desplegados.
+
+### Jenkins
+
+Se agregó un pipeline declarativo en:
+
+- `automation/Jenkinsfile`
+
+Para usarlo en Jenkins:
+
+1. Crea un Pipeline job.
+2. Configura `Pipeline script from SCM`.
+3. En `Script Path` usa:
+
+```text
+automation/Jenkinsfile
+```
+
+#### Parámetros del pipeline
+
+- `SUITE`
+- `WEB_BASE_URL`
+- `API_BASE_URL`
+- `DEMO_USER_EMAIL`
+- `DEMO_USER_PASSWORD`
+
+#### Qué hace el pipeline
+
+- checkout del repositorio
+- `npm ci`
+- instalación de navegadores Playwright
+- ejecución de la suite elegida
+- generación de reporte Allure
+- archivado de `reports/` y `test-results/`
+
+#### Suites disponibles en Jenkins
+
+- `smoke`
+- `api`
+- `e2e`
+- `regression`
+- `all`
+
+### Consideraciones de infraestructura
+
+Los pipelines no levantan automáticamente `frontend` y `backend`. Actualmente asumen una de estas dos opciones:
+
+- que ya existe un ambiente accesible por URL
+- que vas a extender el pipeline para arrancar los servicios antes de correr las pruebas
+
+Si luego quieres pipeline full local, el siguiente paso sería agregar stages para:
+
+- levantar backend Laravel
+- levantar frontend Angular
+- esperar health checks
+- correr Playwright contra esos servicios
+
 ## Allure
 
 ### 1. Instalar reporter y CLI

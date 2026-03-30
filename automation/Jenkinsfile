@@ -1,0 +1,114 @@
+pipeline {
+  agent any
+
+  options {
+    timestamps()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+  }
+
+  parameters {
+    choice(name: 'SUITE', choices: ['smoke', 'api', 'e2e', 'regression', 'all'], description: 'Suite to execute')
+    string(name: 'WEB_BASE_URL', defaultValue: 'http://localhost:4200', description: 'Frontend base URL')
+    string(name: 'API_BASE_URL', defaultValue: 'http://localhost:8000/api/v1', description: 'Backend API base URL')
+    string(name: 'DEMO_USER_EMAIL', defaultValue: 'admin@vetdemo.test', description: 'Demo user email')
+    password(name: 'DEMO_USER_PASSWORD', defaultValue: 'password', description: 'Demo user password')
+  }
+
+  environment {
+    CI = 'true'
+    PLAYWRIGHT_JUNIT_OUTPUT_NAME = 'results.xml'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Install dependencies') {
+      steps {
+        dir('automation') {
+          script {
+            if (isUnix()) {
+              sh 'npm ci'
+            } else {
+              bat 'npm ci'
+            }
+          }
+        }
+      }
+    }
+
+    stage('Install browsers') {
+      when {
+        expression { params.SUITE != 'api' }
+      }
+      steps {
+        dir('automation') {
+          script {
+            if (isUnix()) {
+              sh 'npx playwright install --with-deps'
+            } else {
+              bat 'npx.cmd playwright install'
+            }
+          }
+        }
+      }
+    }
+
+    stage('Run tests') {
+      steps {
+        dir('automation') {
+          script {
+            withEnv([
+              "WEB_BASE_URL=${params.WEB_BASE_URL}",
+              "API_BASE_URL=${params.API_BASE_URL}",
+              "DEMO_USER_EMAIL=${params.DEMO_USER_EMAIL}",
+              "DEMO_USER_PASSWORD=${params.DEMO_USER_PASSWORD}"
+            ]) {
+              if (isUnix()) {
+                if (params.SUITE == 'all') {
+                  sh 'npm test'
+                } else {
+                  sh "npm run test:${params.SUITE}"
+                }
+              } else {
+                if (params.SUITE == 'all') {
+                  bat 'npm test'
+                } else {
+                  bat "npm run test:${params.SUITE}"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    stage('Generate Allure Report') {
+      when {
+        expression { fileExists('automation/reports/allure-results') }
+      }
+      steps {
+        dir('automation') {
+          script {
+            if (isUnix()) {
+              sh 'npx allure generate reports/allure-results --clean -o reports/allure-report'
+            } else {
+              bat 'npx.cmd allure generate reports/allure-results --clean -o reports/allure-report'
+            }
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      archiveArtifacts artifacts: 'automation/reports/**/*', allowEmptyArchive: true
+      archiveArtifacts artifacts: 'automation/test-results/**/*', allowEmptyArchive: true
+      junit testResults: 'automation/test-results/*.xml', allowEmptyResults: true
+    }
+  }
+}

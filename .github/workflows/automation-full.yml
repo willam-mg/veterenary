@@ -1,0 +1,97 @@
+name: Automation Full Regression
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Suite to run
+        required: true
+        default: regression
+        type: choice
+        options:
+          - e2e
+          - regression
+          - all
+
+jobs:
+  full-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    defaults:
+      run:
+        working-directory: automation
+
+    env:
+      CI: true
+      WEB_BASE_URL: ${{ vars.WEB_BASE_URL || 'http://localhost:4200' }}
+      API_BASE_URL: ${{ vars.API_BASE_URL || 'http://localhost:8000/api/v1' }}
+      DEMO_USER_EMAIL: ${{ secrets.DEMO_USER_EMAIL || 'admin@vetdemo.test' }}
+      DEMO_USER_PASSWORD: ${{ secrets.DEMO_USER_PASSWORD || 'password' }}
+      SELECTED_SUITE: ${{ github.event.inputs.suite || 'all' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: automation/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run selected suite
+        shell: bash
+        run: |
+          case "$SELECTED_SUITE" in
+            e2e)
+              npm run test:e2e
+              ;;
+            regression)
+              npm run test:regression
+              ;;
+            all)
+              npm run test:e2e
+              npm run test:regression
+              ;;
+            *)
+              echo "Unsupported suite: $SELECTED_SUITE"
+              exit 1
+              ;;
+          esac
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-full
+          path: automation/reports/html-report
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-full
+          path: automation/reports/allure-results
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-full
+          path: automation/test-results
+          if-no-files-found: ignore
+          retention-days: 14

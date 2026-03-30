@@ -1,0 +1,83 @@
+name: Automation CI
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'automation/**'
+      - '.github/workflows/automation-ci.yml'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'automation/**'
+      - '.github/workflows/automation-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  smoke-and-api:
+    name: ${{ matrix.suite }} suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [smoke, api]
+
+    defaults:
+      run:
+        working-directory: automation
+
+    env:
+      CI: true
+      WEB_BASE_URL: ${{ vars.WEB_BASE_URL || 'http://localhost:4200' }}
+      API_BASE_URL: ${{ vars.API_BASE_URL || 'http://localhost:8000/api/v1' }}
+      DEMO_USER_EMAIL: ${{ secrets.DEMO_USER_EMAIL || 'admin@vetdemo.test' }}
+      DEMO_USER_PASSWORD: ${{ secrets.DEMO_USER_PASSWORD || 'password' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: automation/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        if: matrix.suite != 'api'
+        run: npx playwright install --with-deps chromium
+
+      - name: Run suite
+        run: npm run test:${{ matrix.suite }} -- --project=chromium
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.suite }}
+          path: automation/reports/html-report
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.suite }}
+          path: automation/reports/allure-results
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.suite }}
+          path: automation/test-results
+          if-no-files-found: ignore
+          retention-days: 14
