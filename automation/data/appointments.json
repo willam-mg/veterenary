@@ -1,0 +1,10 @@
+[
+  {
+    "reason": "Vacunacion anual",
+    "status": "scheduled"
+  },
+  {
+    "reason": "Control post operatorio",
+    "status": "confirmed"
+  }
+]

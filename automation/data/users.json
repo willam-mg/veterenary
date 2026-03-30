@@ -1,0 +1,16 @@
+[
+  {
+    "name": "QA Reception",
+    "emailPrefix": "qa.reception",
+    "phone": "70000001",
+    "role": "receptionist",
+    "password": "password"
+  },
+  {
+    "name": "QA Vet",
+    "emailPrefix": "qa.vet",
+    "phone": "70000002",
+    "role": "veterinarian",
+    "password": "password"
+  }
+]

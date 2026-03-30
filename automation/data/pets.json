@@ -1,0 +1,16 @@
+[
+  {
+    "namePrefix": "Firulais",
+    "species": "dog",
+    "breed": "Labrador",
+    "sex": "male",
+    "color": "Brown"
+  },
+  {
+    "namePrefix": "Mishi",
+    "species": "cat",
+    "breed": "Siamese",
+    "sex": "female",
+    "color": "Cream"
+  }
+]
