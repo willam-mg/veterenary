@@ -1,0 +1,72 @@
+﻿<section class="page" data-testid="pets-page">
+  <header>
+    <h1>Mascotas</h1>
+    <p>Gestion simple para demo funcional.</p>
+  </header>
+
+  <form [formGroup]="petForm" (ngSubmit)="submit()" class="pet-form" data-testid="pet-form">
+    <div class="form-row">
+      <label for="name">Nombre</label>
+      <input id="name" formControlName="name" data-testid="pet-name-input" />
+      <small *ngIf="controlHasError('name')" class="error">Nombre requerido (min 2).</small>
+    </div>
+
+    <div class="form-row">
+      <label for="species">Especie</label>
+      <select id="species" formControlName="species" data-testid="pet-species-select">
+        <option value="Dog">Perro</option>
+        <option value="Cat">Gato</option>
+        <option value="Other">Otro</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label for="age">Edad</label>
+      <input id="age" type="number" formControlName="age" data-testid="pet-age-input" />
+      <small *ngIf="controlHasError('age')" class="error">Edad invalida.</small>
+    </div>
+
+    <div class="form-row" *ngIf="!loadingOwners(); else loadingOwnersTpl">
+      <label for="ownerId">Cliente</label>
+      <select id="ownerId" formControlName="ownerId" data-testid="pet-owner-select">
+        <option *ngFor="let owner of owners()" [value]="owner.id">{{ owner.name }}</option>
+      </select>
+      <small *ngIf="controlHasError('ownerId')" class="error">Selecciona un cliente.</small>
+    </div>
+
+    <div class="form-row">
+      <label for="vaccineDueDate">Proxima vacuna</label>
+      <input
+        id="vaccineDueDate"
+        type="date"
+        formControlName="vaccineDueDate"
+        data-testid="pet-vaccine-input"
+      />
+    </div>
+
+    <button type="submit" [disabled]="saving()" data-testid="pet-submit-button">
+      {{ saving() ? 'Guardando...' : 'Crear mascota' }}
+    </button>
+
+    <p class="message" *ngIf="message()" data-testid="pet-form-message">{{ message() }}</p>
+
+    <ng-template #loadingOwnersTpl>
+      <p>Cargando clientes...</p>
+    </ng-template>
+  </form>
+
+  <section>
+    <h2>Listado</h2>
+    <div class="pets-grid" data-testid="pets-list">
+      <article class="pet-card" *ngFor="let pet of pets()" data-testid="pet-card">
+        <img [src]="pet.imageUrl" [alt]="pet.name" />
+        <div>
+          <h3>{{ pet.name }}</h3>
+          <p>{{ pet.species }} - {{ pet.age }} anios</p>
+          <p>Cliente: {{ pet.ownerName }}</p>
+          <a [routerLink]="['/pets', pet.id]" data-testid="pet-detail-link">Ver detalle</a>
+        </div>
+      </article>
+    </div>
+  </section>
+</section>

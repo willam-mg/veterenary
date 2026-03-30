@@ -1,0 +1,369 @@
+[
+    {
+        "Manejo": "conjunta",
+        "Cuenta Ahorro (Bs)": "78293323",
+        "Saldo Bs.": " 300.000 ",
+        "Cuenta Ahorro (USD)": "41945482",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "1989073",
+        "Cuenta Corriente (USD)": "2016392",
+        "holders": [
+            {
+                "name": "BANCO CAPACITABOL S.A.",
+                "identificacion": "4919405015",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "VASQUEZ OMONTE JORGE MARTIN",
+                    "CARBALLO VALENCIA ALEJANDRA PETRONA"
+                ],
+                "FIRMAS": [21,22]
+            }
+        ]
+    },
+    {
+        "Manejo": "conjunta",
+        "Cuenta Ahorro (Bs)": "26511773",
+        "Saldo Bs.": " 300.000 ",
+        "Cuenta Ahorro (USD)": "20169112",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "5221793",
+        "Cuenta Corriente (USD)": "8635872",
+        "holders": [
+            {
+                "name": "CAPACITACIÓN TÉCNICA INNOVADORA CAPACITABOL",
+                "identificacion": "4919405014",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "VASQUEZ OMONTE JORGE MARTIN"
+                ],
+                "FIRMAS": [21]
+            }
+        ]
+    },
+    {
+        "Manejo": "conjunta",
+        "Cuenta Ahorro (Bs)": "85264863",
+        "Saldo Bs.": " 350.000 ",
+        "Cuenta Ahorro (USD)": "33518682",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "5423743",
+        "Cuenta Corriente (USD)": "2924012",
+        "holders": [
+            {
+                "name": "CERVECERÍA BOLIVIANA NACIONAL",
+                "identificacion": "1020229024",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "BELLIDO CHIRI GABRIEL ENRIQUE",
+                    "CUADROS PONDE DYLAN ANDRES",
+                    "OMONTE RIOS VALENTINA ALEXANDRA",
+                    "ROJAS GUTIERREZ LUIS ANTONIO"
+                ],
+                "FIRMAS": [4, 5, 6,7]
+            }
+        ]
+    },
+    {
+        "Manejo": "conjunta",
+        "Cuenta Ahorro (Bs)": "18487313",
+        "Saldo Bs.": " 350.000 ",
+        "Cuenta Ahorro (USD)": "12475952",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "1977933",
+        "Cuenta Corriente (USD)": "8901702",
+        "holders": [
+            {
+                "name": "PIL ANDINA S.A.",
+                "identificacion": "1020757027",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "SANCHEZ SOTO VALERIA ANALIZ",
+                    "ALMENDRAS COCA ISAIAS ADRIAN"
+                ],
+                "FIRMAS": [1,3]
+            }
+        ]
+    },
+    {
+        "Manejo": "conjunta",
+        "Cuenta Ahorro (Bs)": "77283393",
+        "Saldo Bs.": " 350.000 ",
+        "Cuenta Ahorro (USD)": "19837382",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "2726343",
+        "Cuenta Corriente (USD)": "4973822",
+        "holders": [
+            {
+                "name": "TELEFÓNICA CELULAR DE BOLIVIA S.A.",
+                "identificacion": "1020255020",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "COLQUE CAYO JHOVANY CRISTHIAN",
+                    "VALLEJOS SOLIA MARTIN AURELIO",
+                    "ESTRADA RODRIGUEZ ANA MARIA",
+                    "PEREZ NOGALES CLAUDIA ANDREA"
+                ],
+                "FIRMAS": [2, 9, 10,12]
+            }
+        ]
+    },
+    {
+        "Manejo": "conjunta",
+        "Cuenta Ahorro (Bs)": "76401843",
+        "Saldo Bs.": " 100.000 ",
+        "Cuenta Ahorro (USD)": "31957732",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "2336363",
+        "Cuenta Corriente (USD)": "1438602",
+        "holders": [
+            {
+                "name": "ROJAS GUTIERREZ LUIS ANTONIO",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "ROJAS GUTIERREZ LUIS ANTONIO"
+                ],
+                "FIRMAS": [7]
+            },
+            {
+                "name": "TORREZ AGUIRRE EVELIN",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "TORREZ AGUIRRE EVELIN"
+                ],
+                "FIRMAS": [19]
+            }
+        ]
+    },
+    {
+        "Manejo": "conjunta",
+        "Cuenta Ahorro (Bs)": "26774073",
+        "Saldo Bs.": " 100.000 ",
+        "Cuenta Ahorro (USD)": "22291102",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "8043183",
+        "Cuenta Corriente (USD)": "7768562",
+        "holders": [
+            {
+                "name": "LOPEZ SANCHEZ CRISTINA LISETH",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "LOPEZ SANCHEZ CRISTINA LISETH"
+                ],
+                "FIRMAS": [11]
+            },
+            {
+                "name": "CORDOVA MENDOZA WENDY MARIA",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "CORDOVA MENDOZA WENDY MARIA"
+                ],
+                "FIRMAS": [8]
+            },
+            {
+                "name": " VALLEJOS SOLIA MARTIN AURELIO",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "VALLEJOS SOLIA MARTIN AURELIO"
+                ],
+                "FIRMAS": [9]
+            }
+        ]
+    },
+    {
+        "Manejo": "conjunta",
+        "Cuenta Ahorro (Bs)": "",
+        "Saldo Bs.": " 100.000 ",
+        "Cuenta Ahorro (USD)": "",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "6637503",
+        "Cuenta Corriente (USD)": "3235082",
+        "holders": [
+            {
+                "name": "SANCHEZ SOTO VALERIA ANALIZ",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "SANCHEZ SOTO VALERIA ANALIZ"
+                ],
+                "FIRMAS": [1]
+            },
+            {
+                "name": "ARAMAYO BECERRA BRISA INES",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "ARAMAYO BECERRA BRISA INES"
+                ],
+                "FIRMAS": [15]
+            },
+            {
+                "name": "MIRANDA RIOS WILLIAM ALBERTO",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "MIRANDA RIOS WILLIAM ALBERTO"
+                ],
+                "FIRMAS": [20]
+            }
+        ]
+    },
+    {
+        "Manejo": "conjunta",
+        "Cuenta Ahorro (Bs)": "36465523",
+        "Saldo Bs.": " 100.000 ",
+        "Cuenta Ahorro (USD)": "83515172",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "9742443",
+        "Cuenta Corriente (USD)": "6696052",
+        "holders": [
+            {
+                "name": "PEREZ NOGALES CLAUDIA ANDREA",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "PEREZ NOGALES CLAUDIA ANDREA"
+                ],
+                "FIRMAS": [12]
+            },
+            {
+                "name": "ESTRADA RODRIGUEZ ANA MARIA",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "ESTRADA RODRIGUEZ ANA MARIA"
+                ],
+                "FIRMAS": [10]
+            }
+        ]
+    },
+    {
+        "Manejo": "indistinta",
+        "Cuenta Ahorro (Bs)": "67525763",
+        "Saldo Bs.": " 100.000 ",
+        "Cuenta Ahorro (USD)": "44157962",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "3773123",
+        "Cuenta Corriente (USD)": "2210352",
+        "holders": [
+            {
+                "name": "VALLEJOS SOLIA MARTIN AURELIO",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "VALLEJOS SOLIA MARTIN AURELIO"
+                ],
+                "FIRMAS": [9]
+            },
+            {
+                "name": "ESTRADA RODRIGUEZ ANA MARIA",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "ESTRADA RODRIGUEZ ANA MARIA"
+                ],
+                "FIRMAS": [10]
+            }
+        ]
+    },
+    {
+        "Manejo": "indistinta",
+        "Cuenta Ahorro (Bs)": "",
+        "Saldo Bs.": " 100.000 ",
+        "Cuenta Ahorro (USD)": "",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "8208923",
+        "Cuenta Corriente (USD)": "7650462",
+        "holders": [
+            {
+                "name": "MIRANDA RIOS WILLIAM ALBERTO",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "MIRANDA RIOS WILLIAM ALBERTO"
+                ],
+                "FIRMAS": [20]
+            },
+            {
+                "name": "ROJAS GUTIERREZ LUIS ANTONIO",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "CUADROS PONDE DYLAN ANDRES"
+                ],
+                "FIRMAS": [7]
+            }
+        ]
+    },
+    {
+        "Manejo": "indistinta",
+        "Cuenta Ahorro (Bs)": "56419233",
+        "Saldo Bs.": " 100.000 ",
+        "Cuenta Ahorro (USD)": "17396532",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "1037173",
+        "Cuenta Corriente (USD)": "4497592",
+        "holders": [
+            {
+                "name": "VALLEJOS SOLIA MARTIN AURELIO",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "VALLEJOS SOLIA MARTIN AURELIO"
+                ],
+                "FIRMAS": [9]
+            },
+            {
+                "name": "COLQUE CAYO JHOVANY CRISTHIAN",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "COLQUE CAYO JHOVANY CRISTHIAN"
+                ],
+                "FIRMAS": [2]
+            },
+            {
+                "name": "ALMENDRAS COCA ISAIAS ADRIAN",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "ALMENDRAS COCA ISAIAS ADRIAN"
+                ],
+                "FIRMAS": [3]
+            }
+        ]
+    },
+    {
+        "Manejo": "indistinta",
+        "Cuenta Ahorro (Bs)": "34846013",
+        "Saldo Bs.": " 100.000 ",
+        "Cuenta Ahorro (USD)": "82106242",
+        "Saldo $us.": " 100.000 ",
+        "Cuenta Corriente (Bs)": "2173083",
+        "Cuenta Corriente (USD)": "1788982",
+        "holders": [
+            {
+                "name": "CARBALLO VALENCIA ALEJANDRA PETRONA",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "CARBALLO VALENCIA ALEJANDRA PETRONA"
+                ],
+                "FIRMAS": [22]
+            },
+            {
+                "name": "PEREZ NOGALES CLAUDIA ANDREA",
+                "identificacion": "",
+                "ci_extencion": "",
+                "nombre_firmas": [
+                    "EREZ NOGALES CLAUDIA ANDREA"
+                ],
+                "FIRMAS": [12]
+            }
+        ]
+    }
+]

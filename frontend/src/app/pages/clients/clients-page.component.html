@@ -1,0 +1,18 @@
+﻿<section class="page" data-testid="clients-page">
+  <header>
+    <h1>Clientes</h1>
+    <p>Listado conectado a JSONPlaceholder Users.</p>
+  </header>
+
+  <p *ngIf="loading()">Cargando clientes...</p>
+  <p *ngIf="error()" class="error" data-testid="clients-error">{{ error() }}</p>
+
+  <div class="clients-grid" *ngIf="!loading() && !error()" data-testid="clients-list">
+    <article *ngFor="let owner of owners()" class="client-card" data-testid="client-card">
+      <h2>{{ owner.name }}</h2>
+      <p>{{ owner.email }}</p>
+      <p>{{ owner.phone }}</p>
+      <p>Ciudad: {{ owner.city }}</p>
+    </article>
+  </div>
+</section>

@@ -1,0 +1,30 @@
+﻿.page {
+  display: grid;
+  gap: 1rem;
+}
+
+.clients-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.client-card {
+  border: 1px solid #dce5f2;
+  border-radius: 0.75rem;
+  padding: 0.8rem;
+  background: #fff;
+}
+
+.client-card h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.client-card p {
+  margin: 0 0 0.2rem;
+}
+
+.error {
+  color: #8b2323;
+}

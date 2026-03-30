@@ -1,0 +1,63 @@
+﻿.page {
+  display: grid;
+  gap: 1rem;
+}
+
+.appointment-form {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  background: #fff;
+  border: 1px solid #dce5f2;
+  border-radius: 0.75rem;
+  padding: 0.9rem;
+}
+
+.appointment-form input,
+.appointment-form button {
+  font: inherit;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.45rem;
+}
+
+.appointment-form input {
+  border: 1px solid #bfd1ea;
+}
+
+.appointment-form button {
+  background: #1958a8;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.appointments-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.appointment-card {
+  border: 1px solid #dce5f2;
+  border-radius: 0.75rem;
+  padding: 0.85rem;
+  background: #fff;
+}
+
+.appointment-card h2,
+.appointment-card p {
+  margin: 0 0 0.25rem;
+}
+
+.appointment-card span {
+  font-weight: 600;
+  color: #915c00;
+}
+
+.appointment-card .confirmed {
+  color: #145a32;
+}
+
+.error {
+  color: #8b2323;
+}

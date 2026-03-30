@@ -1,0 +1,19 @@
+﻿<div class="shell" data-testid="app-shell">
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <strong>Vet QA Demo</strong>
+    </div>
+
+    <nav data-testid="main-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" data-testid="nav-dashboard">Dashboard</a>
+      <a routerLink="/pets" routerLinkActive="active" data-testid="nav-pets">Mascotas</a>
+      <a routerLink="/clients" routerLinkActive="active" data-testid="nav-clients">Clientes</a>
+      <a routerLink="/appointments" routerLinkActive="active" data-testid="nav-appointments">Citas</a>
+    </nav>
+  </header>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

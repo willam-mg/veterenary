@@ -1,0 +1,134 @@
+[
+    {
+        "id": "1",
+        "management": "Individual",
+        "account_number": "8775723",
+        "balance": " 300000 "
+    },
+    {
+        "id": "2",
+        "management": "Individual",
+        "account_number": "1982463",
+        "balance": " 300000 "
+    },
+    {
+        "id": "3",
+        "management": "Individual",
+        "account_number": "9487493",
+        "balance": " 300000 "
+    },
+    {
+        "id": "4",
+        "management": "Individual",
+        "account_number": "1972513",
+        "balance": " 300000 "
+    },
+    {
+        "id": "5",
+        "management": "Individual",
+        "account_number": "4969223",
+        "balance": " 300000 "
+    },
+    {
+        "id": "6",
+        "management": "Individual",
+        "account_number": "9968653",
+        "balance": " 300000 "
+    },
+    {
+        "id": "7",
+        "management": "Individual",
+        "account_number": "3196843",
+        "balance": " 300000 "
+    },
+    {
+        "id": "8",
+        "management": "Individual",
+        "account_number": "3830603",
+        "balance": " 300000 "
+    },
+    {
+        "id": "9",
+        "management": "Individual",
+        "account_number": "1694033",
+        "balance": " 300000 "
+    },
+    {
+        "id": "10",
+        "management": "Individual",
+        "account_number": "3586073",
+        "balance": " 300000 "
+    },
+    {
+        "id": "11",
+        "management": "Individual",
+        "account_number": "1953253",
+        "balance": " 300000 "
+    },
+    {
+        "id": "12",
+        "management": "Individual",
+        "account_number": "7248343",
+        "balance": " 300000 "
+    },
+    {
+        "id": "13",
+        "management": "Individual",
+        "account_number": "5558843",
+        "balance": " 300000 "
+    },
+    {
+        "id": "14",
+        "management": "Individual",
+        "account_number": "9825543",
+        "balance": " 300000 "
+    },
+    {
+        "id": "15",
+        "management": "Individual",
+        "account_number": "6123403",
+        "balance": " 300000 "
+    },
+    {
+        "id": "16",
+        "management": "Individual",
+        "account_number": "8674603",
+        "balance": " 300000 "
+    },
+    {
+        "id": "17",
+        "management": "Individual",
+        "account_number": "7360593",
+        "balance": " 300000 "
+    },
+    {
+        "id": "18",
+        "management": "Individual",
+        "account_number": "2268823",
+        "balance": " 300000 "
+    },
+    {
+        "id": "19",
+        "management": "Individual",
+        "account_number": "8422253",
+        "balance": " 300000 "
+    },
+    {
+        "id": "20",
+        "management": "Individual",
+        "account_number": "3920043",
+        "balance": " 300000 "
+    },
+    {
+        "id": "21",
+        "management": "Individual",
+        "account_number": "4111203",
+        "balance": " 300000 "
+    },
+    {
+        "id": "22",
+        "management": "Individual",
+        "account_number": "2650803",
+        "balance": " 300000"
+    }
+]

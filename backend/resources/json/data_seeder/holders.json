@@ -1,0 +1,134 @@
+[
+    {
+        "id": "1",
+        "name": "SANCHEZ SOTO VALERIA ANALIZ",
+        "ci": "8034567",
+        "ci_extencion": "L.P."
+    },
+    {
+        "id": "2",
+        "name": "COLQUE CAYO JHOVANY CRISTHIAN",
+        "ci": "6745235",
+        "ci_extencion": "L.P."
+    },
+    {
+        "id": "3",
+        "name": "ALMENDRAS COCA ISAIAS ADRIAN",
+        "ci": "4910432",
+        "ci_extencion": "CB"
+    },
+    {
+        "id": "4",
+        "name": "BELLIDO CHIRI GABRIEL ENRIQUE",
+        "ci": "4045234",
+        "ci_extencion": "CB"
+    },
+    {
+        "id": "5",
+        "name": "CUADROS PONDE DYLAN ANDRES",
+        "ci": "5634739",
+        "ci_extencion": "SCZ"
+    },
+    {
+        "id": "6",
+        "name": "OMONTE RIOS VALENTINA ALEXANDRA",
+        "ci": "7834562",
+        "ci_extencion": "SCZ"
+    },
+    {
+        "id": "7",
+        "name": "ROJAS GUTIERREZ LUIS ANTONIO",
+        "ci": "6532653",
+        "ci_extencion": "CH"
+    },
+    {
+        "id": "8",
+        "name": "CORDOVA MENDOZA WENDY MARIA",
+        "ci": "6734526",
+        "ci_extencion": "CH"
+    },
+    {
+        "id": "9",
+        "name": "VALLEJOS SOLIA MARTIN AURELIO",
+        "ci": "8243373",
+        "ci_extencion": "CH"
+    },
+    {
+        "id": "10",
+        "name": "ESTRADA RODRIGUEZ ANA MARIA",
+        "ci": "17253362",
+        "ci_extencion": "TJ"
+    },
+    {
+        "id": "11",
+        "name": "LOPEZ SANCHEZ CRISTINA LISETH",
+        "ci": "14252636",
+        "ci_extencion": "TJ"
+    },
+    {
+        "id": "12",
+        "name": "PEREZ NOGALES CLAUDIA ANDREA",
+        "ci": "14253653",
+        "ci_extencion": "TJ"
+    },
+    {
+        "id": "13",
+        "name": "BETANCOURT OPORTO LICIEL ITAITI",
+        "ci": "4523637",
+        "ci_extencion": "TJ"
+    },
+    {
+        "id": "14",
+        "name": "ANAGUA MUÑOZ VILMA ESTHER",
+        "ci": "7953426",
+        "ci_extencion": "CB"
+    },
+    {
+        "id": "15",
+        "name": "ARAMAYO BECERRA BRISA INES",
+        "ci": "6524343",
+        "ci_extencion": "L.P."
+    },
+    {
+        "id": "16",
+        "name": "ESCALERA LEON PAMELA CECILIA",
+        "ci": "17643797",
+        "ci_extencion": "OR"
+    },
+    {
+        "id": "17",
+        "name": "SEJAS OROSCO CELINA",
+        "ci": "11145660",
+        "ci_extencion": "OR"
+    },
+    {
+        "id": "18",
+        "name": "MAMANI LIZARAZU ERICK MARIO",
+        "ci": "4563245",
+        "ci_extencion": "OR"
+    },
+    {
+        "id": "19",
+        "name": "TORREZ AGUIRRE EVELIN",
+        "ci": "8850298",
+        "ci_extencion": "PO"
+    },
+    {
+        "id": "20",
+        "name": "MIRANDA RIOS WILLIAM ALBERTO",
+        "ci": "9856357",
+        "ci_extencion": "PO"
+    },
+    {
+        "id": "21",
+        "name": "VASQUEZ OMONTE JORGE MARTIN",
+        "ci": "4919405",
+        "ci_extencion": "L.P."
+    },
+    {
+        "id": "22",
+        "name": "CARBALLO VALENCIA ALEJANDRA PETRONA",
+        "ci": "8050298",
+        "ci_extencion": "CB"
+    }
+]

@@ -1,0 +1,48 @@
+﻿<section class="page" data-testid="dashboard-page">
+  <header class="page-header">
+    <h1>Sistema de Veterinaria</h1>
+    <p>Panel de control para demo de QA y automatizacion</p>
+  </header>
+
+  <div *ngIf="loading()" class="status">Cargando metricas...</div>
+  <div *ngIf="error()" class="status error" data-testid="dashboard-error">{{ error() }}</div>
+
+  <div class="cards" *ngIf="!loading()">
+    <article class="card" data-testid="metric-pets">
+      <h2>Mascotas</h2>
+      <strong>{{ petsCount() }}</strong>
+    </article>
+
+    <article class="card" data-testid="metric-clients">
+      <h2>Clientes</h2>
+      <strong>{{ ownersCount() }}</strong>
+    </article>
+
+    <article class="card" data-testid="metric-appointments">
+      <h2>Citas (demo)</h2>
+      <strong>{{ appointmentsCount() }}</strong>
+    </article>
+
+    <article class="card" data-testid="metric-pending">
+      <h2>Pendientes</h2>
+      <strong>{{ pendingAppointmentsCount() }}</strong>
+    </article>
+  </div>
+
+  <section class="alerts" data-testid="vaccines-alerts">
+    <h2>Proximos controles/vacunas</h2>
+    <ul *ngIf="upcomingVaccines().length; else emptyVaccines">
+      <li *ngFor="let pet of upcomingVaccines()">
+        {{ pet.name }} ({{ pet.ownerName }}) - {{ pet.vaccineDueDate }}
+      </li>
+    </ul>
+    <ng-template #emptyVaccines>
+      <p>Sin alertas cercanas.</p>
+    </ng-template>
+  </section>
+
+  <div class="quick-links">
+    <a routerLink="/pets" data-testid="quick-pets">Ir a mascotas</a>
+    <a routerLink="/appointments" data-testid="quick-appointments">Ir a citas</a>
+  </div>
+</section>
