@@ -4,6 +4,7 @@ Base full stack para una veterinaria con arquitectura separada:
 
 - `frontend/`: SPA Angular 20
 - `backend/`: API REST Laravel 12 + Sanctum
+- `automation/`: Playwright tests
 
 La solución está pensada para integración frontend-backend y para servir como base de QA Automation con Playwright.
 
