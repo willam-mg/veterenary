@@ -1,0 +1,27 @@
+@if (pagination(); as page) {
+  <div class="pagination-bar">
+    <span class="muted">
+      Mostrando {{ page.from || 0 }}-{{ page.to || 0 }} de {{ page.total }} registros
+    </span>
+
+    <div class="pagination-actions">
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="page.current_page <= 1"
+        (click)="previous()"
+      >
+        Anterior
+      </button>
+      <span class="page-indicator">Página {{ page.current_page }} de {{ page.last_page }}</span>
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="page.current_page >= page.last_page"
+        (click)="next()"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
+}

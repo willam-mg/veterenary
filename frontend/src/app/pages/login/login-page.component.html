@@ -1,0 +1,32 @@
+<section class="auth-shell">
+  <div class="panel auth-card">
+    <div class="panel-header">
+      <div>
+        <h1>Iniciar sesión</h1>
+        <p class="panel-subtitle">Usuario demo: admin@vetdemo.test / password</p>
+      </div>
+    </div>
+
+    @if (error()) {
+      <div class="message error">{{ error() }}</div>
+    }
+
+    <form class="form-grid" [formGroup]="loginForm" (ngSubmit)="submit()">
+      <label class="form-field full">
+        <span>Email</span>
+        <input type="email" formControlName="email" data-testid="login-email" />
+      </label>
+      <label class="form-field full">
+        <span>Contraseña</span>
+        <input type="password" formControlName="password" data-testid="login-password" />
+      </label>
+
+      <div class="action-row">
+        <button type="submit" class="primary-button" data-testid="login-submit">
+          {{ loading() ? 'Ingresando...' : 'Ingresar' }}
+        </button>
+        <a routerLink="/register" class="secondary-button">Crear cuenta</a>
+      </div>
+    </form>
+  </div>
+</section>

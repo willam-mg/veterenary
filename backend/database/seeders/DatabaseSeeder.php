@@ -11,8 +11,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            InventoryMvpSeeder::class,
-        ]);
+        $this->call(VeterinaryDemoSeeder::class);
     }
 }

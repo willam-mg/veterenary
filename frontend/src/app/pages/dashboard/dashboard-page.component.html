@@ -1,48 +1,81 @@
-﻿<section class="page" data-testid="dashboard-page">
-  <header class="page-header">
-    <h1>Sistema de Veterinaria</h1>
-    <p>Panel de control para demo de QA y automatizacion</p>
-  </header>
+<section class="page-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h1>Dashboard veterinario</h1>
+        <p class="panel-subtitle">Resumen operativo para la demo full stack y flujos QA.</p>
+      </div>
+    </div>
 
-  <div *ngIf="loading()" class="status">Cargando metricas...</div>
-  <div *ngIf="error()" class="status error" data-testid="dashboard-error">{{ error() }}</div>
-
-  <div class="cards" *ngIf="!loading()">
-    <article class="card" data-testid="metric-pets">
-      <h2>Mascotas</h2>
-      <strong>{{ petsCount() }}</strong>
-    </article>
-
-    <article class="card" data-testid="metric-clients">
-      <h2>Clientes</h2>
-      <strong>{{ ownersCount() }}</strong>
-    </article>
-
-    <article class="card" data-testid="metric-appointments">
-      <h2>Citas (demo)</h2>
-      <strong>{{ appointmentsCount() }}</strong>
-    </article>
-
-    <article class="card" data-testid="metric-pending">
-      <h2>Pendientes</h2>
-      <strong>{{ pendingAppointmentsCount() }}</strong>
-    </article>
+    @if (loading()) {
+      <p class="empty-state">Cargando métricas...</p>
+    } @else if (error()) {
+      <div class="message error">{{ error() }}</div>
+    } @else if (summary(); as data) {
+      <div class="stats-grid">
+        <article class="stat-card">
+          <span class="muted">Clientes</span>
+          <strong>{{ data.clients_count }}</strong>
+        </article>
+        <article class="stat-card">
+          <span class="muted">Mascotas</span>
+          <strong>{{ data.pets_count }}</strong>
+        </article>
+        <article class="stat-card">
+          <span class="muted">Veterinarios</span>
+          <strong>{{ data.veterinarians_count }}</strong>
+        </article>
+        <article class="stat-card">
+          <span class="muted">Citas</span>
+          <strong>{{ data.appointments_count }}</strong>
+        </article>
+        <article class="stat-card">
+          <span class="muted">Pendientes</span>
+          <strong>{{ data.pending_appointments_count }}</strong>
+        </article>
+        <article class="stat-card">
+          <span class="muted">Historiales</span>
+          <strong>{{ data.clinical_records_count }}</strong>
+        </article>
+      </div>
+    }
   </div>
 
-  <section class="alerts" data-testid="vaccines-alerts">
-    <h2>Proximos controles/vacunas</h2>
-    <ul *ngIf="upcomingVaccines().length; else emptyVaccines">
-      <li *ngFor="let pet of upcomingVaccines()">
-        {{ pet.name }} ({{ pet.ownerName }}) - {{ pet.vaccineDueDate }}
-      </li>
-    </ul>
-    <ng-template #emptyVaccines>
-      <p>Sin alertas cercanas.</p>
-    </ng-template>
-  </section>
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Próximas citas</h2>
+        <p class="panel-subtitle">Datos ideales para automatizar validaciones y tablas.</p>
+      </div>
+    </div>
 
-  <div class="quick-links">
-    <a routerLink="/pets" data-testid="quick-pets">Ir a mascotas</a>
-    <a routerLink="/appointments" data-testid="quick-appointments">Ir a citas</a>
+    @if (summary()?.next_appointments?.length) {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Mascota</th>
+              <th>Cliente</th>
+              <th>Veterinario</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (appointment of summary()?.next_appointments; track appointment.id) {
+              <tr>
+                <td>{{ appointment.scheduled_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ appointment.pet?.name }}</td>
+                <td>{{ appointment.pet?.client?.full_name }}</td>
+                <td>{{ appointment.veterinarian?.full_name }}</td>
+                <td><span class="status-chip">{{ appointment.status }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="empty-state">No hay citas próximas cargadas.</p>
+    }
   </div>
 </section>

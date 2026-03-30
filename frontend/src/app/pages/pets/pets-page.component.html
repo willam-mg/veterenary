@@ -1,72 +1,195 @@
-﻿<section class="page" data-testid="pets-page">
-  <header>
-    <h1>Mascotas</h1>
-    <p>Gestion simple para demo funcional.</p>
-  </header>
-
-  <form [formGroup]="petForm" (ngSubmit)="submit()" class="pet-form" data-testid="pet-form">
-    <div class="form-row">
-      <label for="name">Nombre</label>
-      <input id="name" formControlName="name" data-testid="pet-name-input" />
-      <small *ngIf="controlHasError('name')" class="error">Nombre requerido (min 2).</small>
+<section class="page-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h1>Mascotas</h1>
+        <p class="panel-subtitle">Pacientes con fotografía y cliente seleccionado desde modal filtrable.</p>
+      </div>
     </div>
 
-    <div class="form-row">
-      <label for="species">Especie</label>
-      <select id="species" formControlName="species" data-testid="pet-species-select">
-        <option value="Dog">Perro</option>
-        <option value="Cat">Gato</option>
-        <option value="Other">Otro</option>
-      </select>
-    </div>
+    @if (message()) {
+      <div class="message success">{{ message() }}</div>
+    }
+    @if (error()) {
+      <div class="message error">{{ error() }}</div>
+    }
 
-    <div class="form-row">
-      <label for="age">Edad</label>
-      <input id="age" type="number" formControlName="age" data-testid="pet-age-input" />
-      <small *ngIf="controlHasError('age')" class="error">Edad invalida.</small>
-    </div>
-
-    <div class="form-row" *ngIf="!loadingOwners(); else loadingOwnersTpl">
-      <label for="ownerId">Cliente</label>
-      <select id="ownerId" formControlName="ownerId" data-testid="pet-owner-select">
-        <option *ngFor="let owner of owners()" [value]="owner.id">{{ owner.name }}</option>
-      </select>
-      <small *ngIf="controlHasError('ownerId')" class="error">Selecciona un cliente.</small>
-    </div>
-
-    <div class="form-row">
-      <label for="vaccineDueDate">Proxima vacuna</label>
-      <input
-        id="vaccineDueDate"
-        type="date"
-        formControlName="vaccineDueDate"
-        data-testid="pet-vaccine-input"
-      />
-    </div>
-
-    <button type="submit" [disabled]="saving()" data-testid="pet-submit-button">
-      {{ saving() ? 'Guardando...' : 'Crear mascota' }}
-    </button>
-
-    <p class="message" *ngIf="message()" data-testid="pet-form-message">{{ message() }}</p>
-
-    <ng-template #loadingOwnersTpl>
-      <p>Cargando clientes...</p>
-    </ng-template>
-  </form>
-
-  <section>
-    <h2>Listado</h2>
-    <div class="pets-grid" data-testid="pets-list">
-      <article class="pet-card" *ngFor="let pet of pets()" data-testid="pet-card">
-        <img [src]="pet.imageUrl" [alt]="pet.name" />
-        <div>
-          <h3>{{ pet.name }}</h3>
-          <p>{{ pet.species }} - {{ pet.age }} anios</p>
-          <p>Cliente: {{ pet.ownerName }}</p>
-          <a [routerLink]="['/pets', pet.id]" data-testid="pet-detail-link">Ver detalle</a>
+    <form class="form-grid" [formGroup]="petForm" (ngSubmit)="submit()">
+      <div class="form-field full">
+        <span>Cliente</span>
+        @if (selectedClient(); as client) {
+          <div class="selector-pill">
+            @if (client.photo_url) {
+              <img [src]="client.photo_url" [alt]="client.full_name" />
+            }
+            <div>
+              <strong>{{ client.full_name }}</strong>
+              <div class="muted">{{ client.document_number || 'Sin documento' }}</div>
+            </div>
+          </div>
+        } @else {
+          <div class="selector-pill">
+            <span>Sin cliente seleccionado</span>
+          </div>
+        }
+        <div class="action-row">
+          <button type="button" class="secondary-button" (click)="openClientSelector()">
+            Seleccionar cliente
+          </button>
         </div>
-      </article>
+      </div>
+
+      <label class="form-field">
+        <span>Nombre</span>
+        <input type="text" formControlName="name" data-testid="pet-name" />
+      </label>
+      <label class="form-field">
+        <span>Especie</span>
+        <select formControlName="species">
+          <option value="dog">Perro</option>
+          <option value="cat">Gato</option>
+          <option value="other">Otro</option>
+        </select>
+      </label>
+      <label class="form-field">
+        <span>Raza</span>
+        <input type="text" formControlName="breed" />
+      </label>
+      <label class="form-field">
+        <span>Sexo</span>
+        <select formControlName="sex">
+          <option value="male">Macho</option>
+          <option value="female">Hembra</option>
+          <option value="unknown">No definido</option>
+        </select>
+      </label>
+      <label class="form-field">
+        <span>Nacimiento</span>
+        <input type="date" formControlName="birth_date" />
+      </label>
+      <label class="form-field">
+        <span>Peso</span>
+        <input type="number" formControlName="weight" />
+      </label>
+      <label class="form-field">
+        <span>Color</span>
+        <input type="text" formControlName="color" />
+      </label>
+      <label class="form-field">
+        <span>Microchip</span>
+        <input type="text" formControlName="microchip_number" />
+      </label>
+      <label class="form-field">
+        <span>Fotografía</span>
+        <input type="file" accept="image/*" (change)="onPhotoSelected($event)" />
+      </label>
+      <div class="form-field">
+        <span>Vista previa</span>
+        <div class="selector-pill">
+          @if (photoPreview()) {
+            <img [src]="photoPreview()!" alt="Foto mascota" />
+          } @else {
+            <span>Sin foto</span>
+          }
+        </div>
+      </div>
+      <label class="form-field full">
+        <span>Alergias</span>
+        <textarea rows="2" formControlName="allergies"></textarea>
+      </label>
+      <label class="form-field full">
+        <span>Notas</span>
+        <textarea rows="3" formControlName="notes"></textarea>
+      </label>
+
+      <div class="action-row">
+        <button type="submit" class="primary-button" data-testid="pet-submit" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : editingId() ? 'Actualizar mascota' : 'Crear mascota' }}
+        </button>
+        @if (editingId()) {
+          <button type="button" class="secondary-button" (click)="cancelEdit()">Cancelar edición</button>
+        }
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Pacientes registrados</h2>
+        <p class="panel-subtitle">Búsqueda y paginación para grandes listas.</p>
+      </div>
+      <div class="toolbar-row">
+        <input
+          type="search"
+          [value]="search()"
+          (input)="onSearchChange($any($event.target).value)"
+          placeholder="Buscar por mascota, raza, microchip o cliente"
+        />
+      </div>
     </div>
-  </section>
+
+    @if (loading()) {
+      <p class="empty-state">Cargando mascotas...</p>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Mascota</th>
+              <th>Cliente</th>
+              <th>Datos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pet of pets(); track pet.id) {
+              <tr>
+                <td>
+                  <div class="entity-avatar">
+                    @if (pet.photo_url) {
+                      <img [src]="pet.photo_url" [alt]="pet.name" />
+                    }
+                    <div>
+                      <strong>{{ pet.name }}</strong>
+                      <div class="muted">{{ pet.species }} · {{ pet.breed || 'Sin raza' }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ pet.client?.full_name }}</td>
+                <td>
+                  <div>Peso: {{ pet.weight || 'N/D' }}</div>
+                  <div class="muted">Microchip: {{ pet.microchip_number || 'N/D' }}</div>
+                </td>
+                <td>
+                  <div class="action-row">
+                    <button type="button" class="secondary-button" (click)="edit(pet)">Editar</button>
+                    <button type="button" class="danger-button" (click)="remove(pet)">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)" />
+    }
+  </div>
 </section>
+
+<app-entity-selector-modal
+  [open]="selectorOpen()"
+  title="Seleccionar cliente"
+  subtitle="Busca por nombre, documento o teléfono"
+  [items]="clientOptions()"
+  [columns]="clientColumns"
+  [pagination]="clientPagination()"
+  [loading]="clientLoading()"
+  [search]="clientSearch()"
+  imageKey="photo_url"
+  (close)="closeClientSelector()"
+  (searchChange)="onClientSearchChange($event)"
+  (pageChange)="onClientPageChange($event)"
+  (select)="selectClient($event)"
+/>

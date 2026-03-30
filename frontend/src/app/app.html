@@ -1,19 +1,43 @@
-﻿<div class="shell" data-testid="app-shell">
-  <header class="topbar">
-    <div class="brand">
-      <span class="dot"></span>
-      <strong>Vet QA Demo</strong>
-    </div>
+@if (!bootstrapped()) {
+  <div class="loading-screen">Conectando con la API veterinaria...</div>
+} @else {
+  <div class="shell" data-testid="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="eyebrow">Veterinary SPA</span>
+        <strong>VetClinic Demo</strong>
+      </div>
 
-    <nav data-testid="main-nav">
-      <a routerLink="/dashboard" routerLinkActive="active" data-testid="nav-dashboard">Dashboard</a>
-      <a routerLink="/pets" routerLinkActive="active" data-testid="nav-pets">Mascotas</a>
-      <a routerLink="/clients" routerLinkActive="active" data-testid="nav-clients">Clientes</a>
-      <a routerLink="/appointments" routerLinkActive="active" data-testid="nav-appointments">Citas</a>
-    </nav>
-  </header>
+      @if (isAuthenticated()) {
+        <nav data-testid="main-nav">
+          <a routerLink="/dashboard" routerLinkActive="active" data-testid="nav-dashboard">Dashboard</a>
+          <a routerLink="/clients" routerLinkActive="active" data-testid="nav-clients">Clientes</a>
+          <a routerLink="/veterinarians" routerLinkActive="active" data-testid="nav-veterinarians">
+            Veterinarios
+          </a>
+          <a routerLink="/pets" routerLinkActive="active" data-testid="nav-pets">Mascotas</a>
+          <a routerLink="/appointments" routerLinkActive="active" data-testid="nav-appointments">Citas</a>
+          <a routerLink="/clinical-records" routerLinkActive="active" data-testid="nav-records">
+            Historial clínico
+          </a>
+        </nav>
 
-  <main class="content">
-    <router-outlet />
-  </main>
-</div>
+        <div class="session-box">
+          <span>{{ currentUser()?.name }}</span>
+          <button type="button" class="ghost-button" (click)="logout()" data-testid="logout-button">
+            Salir
+          </button>
+        </div>
+      } @else {
+        <nav>
+          <a routerLink="/login" routerLinkActive="active">Login</a>
+          <a routerLink="/register" routerLinkActive="active">Registro</a>
+        </nav>
+      }
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+}

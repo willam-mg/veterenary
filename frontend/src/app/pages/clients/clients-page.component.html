@@ -1,18 +1,135 @@
-﻿<section class="page" data-testid="clients-page">
-  <header>
-    <h1>Clientes</h1>
-    <p>Listado conectado a JSONPlaceholder Users.</p>
-  </header>
+<section class="page-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h1>Clientes</h1>
+        <p class="panel-subtitle">Gestión profesional con fotografía, búsqueda y paginación.</p>
+      </div>
+    </div>
 
-  <p *ngIf="loading()">Cargando clientes...</p>
-  <p *ngIf="error()" class="error" data-testid="clients-error">{{ error() }}</p>
+    @if (message()) {
+      <div class="message success">{{ message() }}</div>
+    }
+    @if (error()) {
+      <div class="message error">{{ error() }}</div>
+    }
 
-  <div class="clients-grid" *ngIf="!loading() && !error()" data-testid="clients-list">
-    <article *ngFor="let owner of owners()" class="client-card" data-testid="client-card">
-      <h2>{{ owner.name }}</h2>
-      <p>{{ owner.email }}</p>
-      <p>{{ owner.phone }}</p>
-      <p>Ciudad: {{ owner.city }}</p>
-    </article>
+    <form class="form-grid" [formGroup]="clientForm" (ngSubmit)="submit()">
+      <label class="form-field">
+        <span>Nombres</span>
+        <input type="text" formControlName="first_name" data-testid="client-first-name" />
+      </label>
+      <label class="form-field">
+        <span>Apellidos</span>
+        <input type="text" formControlName="last_name" data-testid="client-last-name" />
+      </label>
+      <label class="form-field">
+        <span>Email</span>
+        <input type="email" formControlName="email" data-testid="client-email" />
+      </label>
+      <label class="form-field">
+        <span>Teléfono</span>
+        <input type="text" formControlName="phone" data-testid="client-phone" />
+      </label>
+      <label class="form-field">
+        <span>Documento</span>
+        <input type="text" formControlName="document_number" data-testid="client-document" />
+      </label>
+      <label class="form-field">
+        <span>Dirección</span>
+        <input type="text" formControlName="address" />
+      </label>
+      <label class="form-field">
+        <span>Fotografía</span>
+        <input type="file" accept="image/*" (change)="onPhotoSelected($event)" />
+      </label>
+      <div class="form-field">
+        <span>Vista previa</span>
+        <div class="selector-pill">
+          @if (photoPreview()) {
+            <img [src]="photoPreview()!" alt="Foto cliente" />
+          } @else {
+            <span>Sin foto</span>
+          }
+        </div>
+      </div>
+      <label class="form-field full">
+        <span>Notas</span>
+        <textarea rows="3" formControlName="notes"></textarea>
+      </label>
+
+      <div class="action-row">
+        <button type="submit" class="primary-button" data-testid="client-submit" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : editingId() ? 'Actualizar cliente' : 'Crear cliente' }}
+        </button>
+        @if (editingId()) {
+          <button type="button" class="secondary-button" (click)="cancelEdit()">Cancelar edición</button>
+        }
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Listado</h2>
+        <p class="panel-subtitle">Clientes filtrables y listos para grandes volúmenes.</p>
+      </div>
+      <div class="toolbar-row">
+        <input
+          type="search"
+          [value]="search()"
+          (input)="onSearchChange($any($event.target).value)"
+          placeholder="Buscar por nombre, teléfono o documento"
+        />
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="empty-state">Cargando clientes...</p>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Contacto</th>
+              <th>Mascotas</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (client of clients(); track client.id) {
+              <tr>
+                <td>
+                  <div class="entity-avatar">
+                    @if (client.photo_url) {
+                      <img [src]="client.photo_url" [alt]="client.full_name" />
+                    }
+                    <div>
+                      <strong>{{ client.full_name }}</strong>
+                      <div class="muted">{{ client.document_number || 'Sin documento' }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div>{{ client.phone }}</div>
+                  <div class="muted">{{ client.email || 'Sin email' }}</div>
+                </td>
+                <td>{{ client.pets_count ?? 0 }}</td>
+                <td>
+                  <div class="action-row">
+                    <button type="button" class="secondary-button" (click)="edit(client)">Editar</button>
+                    <button type="button" class="danger-button" (click)="remove(client)">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)" />
+    }
   </div>
 </section>

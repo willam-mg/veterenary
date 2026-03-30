@@ -2,22 +2,18 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable;
 
-    const ROLE_ADMIN = 'admin';
-    const ROLE_BRANCH_MANAGER = 'branch_manager';
-    const ROLE_SELLER = 'seller';
-    const ROLE_CASHIER = 'cashier';
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_RECEPTIONIST = 'receptionist';
+    public const ROLE_VETERINARIAN = 'veterinarian';
 
     /**
      * The attributes that are mass assignable.
@@ -27,6 +23,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
         'role',
         'is_active',
@@ -54,21 +51,5 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
-    }
-
-    public function branch()
-    {
-        return $this->belongsTo(Branch::class);
-    }
-
-    public function managedPointsOfSale()
-    {
-        return $this->belongsToMany(PointOfSale::class, 'point_of_sale_user')
-            ->withTimestamps();
-    }
-
-    public function cashRegisters()
-    {
-        return $this->hasMany(CashRegister::class);
     }
 }

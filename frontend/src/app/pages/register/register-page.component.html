@@ -1,0 +1,52 @@
+<section class="auth-shell">
+  <div class="panel auth-card">
+    <div class="panel-header">
+      <div>
+        <h1>Registro</h1>
+        <p class="panel-subtitle">Alta rápida para pruebas automatizadas y demo SPA.</p>
+      </div>
+    </div>
+
+    @if (error()) {
+      <div class="message error">{{ error() }}</div>
+    }
+
+    <form class="form-grid" [formGroup]="registerForm" (ngSubmit)="submit()">
+      <label class="form-field full">
+        <span>Nombre</span>
+        <input type="text" formControlName="name" data-testid="register-name" />
+      </label>
+      <label class="form-field full">
+        <span>Email</span>
+        <input type="email" formControlName="email" data-testid="register-email" />
+      </label>
+      <label class="form-field">
+        <span>Teléfono</span>
+        <input type="text" formControlName="phone" />
+      </label>
+      <label class="form-field">
+        <span>Rol</span>
+        <select formControlName="role">
+          <option value="admin">admin</option>
+          <option value="receptionist">receptionist</option>
+          <option value="veterinarian">veterinarian</option>
+        </select>
+      </label>
+      <label class="form-field">
+        <span>Contraseña</span>
+        <input type="password" formControlName="password" data-testid="register-password" />
+      </label>
+      <label class="form-field">
+        <span>Confirmación</span>
+        <input type="password" formControlName="password_confirmation" />
+      </label>
+
+      <div class="action-row">
+        <button type="submit" class="primary-button" data-testid="register-submit">
+          {{ loading() ? 'Registrando...' : 'Registrar' }}
+        </button>
+        <a routerLink="/login" class="secondary-button">Volver al login</a>
+      </div>
+    </form>
+  </div>
+</section>

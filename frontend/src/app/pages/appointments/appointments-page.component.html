@@ -1,32 +1,217 @@
-﻿<section class="page" data-testid="appointments-page">
-  <header>
-    <h1>Citas</h1>
-    <p>Listado demo desde JSONPlaceholder + alta local para pruebas.</p>
-  </header>
+<section class="page-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h1>Citas</h1>
+        <p class="panel-subtitle">Agenda con selección asistida de mascota y veterinario.</p>
+      </div>
+    </div>
 
-  <form
-    [formGroup]="appointmentForm"
-    (ngSubmit)="submit()"
-    class="appointment-form"
-    data-testid="appointment-form"
-  >
-    <input placeholder="Mascota" formControlName="petName" data-testid="appt-pet-input" />
-    <input placeholder="Cliente" formControlName="ownerName" data-testid="appt-owner-input" />
-    <input type="datetime-local" formControlName="date" data-testid="appt-date-input" />
-    <input placeholder="Motivo" formControlName="reason" data-testid="appt-reason-input" />
-    <button type="submit" data-testid="appt-submit">Registrar cita</button>
-  </form>
+    @if (message()) {
+      <div class="message success">{{ message() }}</div>
+    }
+    @if (error()) {
+      <div class="message error">{{ error() }}</div>
+    }
 
-  <p *ngIf="loading()">Cargando citas...</p>
-  <p *ngIf="error()" class="error" data-testid="appointments-error">{{ error() }}</p>
+    <form class="form-grid" [formGroup]="appointmentForm" (ngSubmit)="submit()">
+      <div class="form-field full">
+        <span>Mascota</span>
+        @if (selectedPet(); as pet) {
+          <div class="selector-pill">
+            @if (pet.photo_url) {
+              <img [src]="pet.photo_url" [alt]="pet.name" />
+            }
+            <div>
+              <strong>{{ pet.name }}</strong>
+              <div class="muted">{{ pet.client?.full_name || 'Sin cliente' }}</div>
+            </div>
+          </div>
+        } @else {
+          <div class="selector-pill"><span>Sin mascota seleccionada</span></div>
+        }
+        <div class="action-row">
+          <button type="button" class="secondary-button" (click)="openPetSelector()">
+            Seleccionar mascota
+          </button>
+        </div>
+      </div>
 
-  <div class="appointments-list" *ngIf="!loading() && !error()" data-testid="appointments-list">
-    <article *ngFor="let appointment of appointments()" class="appointment-card" data-testid="appointment-card">
-      <h2>{{ appointment.petName }}</h2>
-      <p>Cliente: {{ appointment.ownerName }}</p>
-      <p>Fecha: {{ appointment.date | date: 'yyyy-MM-dd HH:mm' }}</p>
-      <p>Motivo: {{ appointment.reason }}</p>
-      <span [class.confirmed]="appointment.status === 'confirmed'">{{ appointment.status }}</span>
-    </article>
+      <div class="form-field full">
+        <span>Veterinario</span>
+        @if (selectedVeterinarian(); as veterinarian) {
+          <div class="selector-pill">
+            @if (veterinarian.photo_url) {
+              <img [src]="veterinarian.photo_url" [alt]="veterinarian.full_name" />
+            }
+            <div>
+              <strong>{{ veterinarian.full_name }}</strong>
+              <div class="muted">{{ veterinarian.specialty || 'General' }}</div>
+            </div>
+          </div>
+        } @else {
+          <div class="selector-pill"><span>Sin veterinario seleccionado</span></div>
+        }
+        <div class="action-row">
+          <button type="button" class="secondary-button" (click)="openVeterinarianSelector()">
+            Seleccionar veterinario
+          </button>
+        </div>
+      </div>
+
+      <label class="form-field">
+        <span>Fecha y hora</span>
+        <input type="datetime-local" formControlName="scheduled_at" data-testid="appointment-date" />
+      </label>
+      <label class="form-field">
+        <span>Estado</span>
+        <select formControlName="status">
+          <option value="scheduled">scheduled</option>
+          <option value="confirmed">confirmed</option>
+          <option value="completed">completed</option>
+          <option value="cancelled">cancelled</option>
+        </select>
+      </label>
+      <label class="form-field full">
+        <span>Motivo</span>
+        <input type="text" formControlName="reason" data-testid="appointment-reason" />
+      </label>
+      <label class="form-field full">
+        <span>Servicios</span>
+        <div class="checkbox-grid">
+          @for (service of services(); track service.id) {
+            <label class="checkbox-item">
+              <input
+                type="checkbox"
+                [checked]="serviceSelected(service.id)"
+                (change)="toggleService(service.id, $any($event.target).checked)"
+              />
+              <span>{{ service.name }} · {{ service.price }}</span>
+            </label>
+          }
+        </div>
+      </label>
+      <label class="form-field full">
+        <span>Notas</span>
+        <textarea rows="3" formControlName="notes"></textarea>
+      </label>
+
+      <div class="action-row">
+        <button type="submit" class="primary-button" data-testid="appointment-submit" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : editingId() ? 'Actualizar cita' : 'Crear cita' }}
+        </button>
+        @if (editingId()) {
+          <button type="button" class="secondary-button" (click)="cancelEdit()">Cancelar edición</button>
+        }
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Agenda</h2>
+        <p class="panel-subtitle">Filtra por estado, mascota, cliente o veterinario.</p>
+      </div>
+      <div class="toolbar-row">
+        <input
+          type="search"
+          [value]="search()"
+          (input)="onSearchChange($any($event.target).value)"
+          placeholder="Buscar citas"
+        />
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="empty-state">Cargando agenda...</p>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Mascota</th>
+              <th>Veterinario</th>
+              <th>Servicios</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (appointment of appointments(); track appointment.id) {
+              <tr>
+                <td>
+                  <div>{{ appointment.scheduled_at | date: 'dd/MM/yyyy HH:mm' }}</div>
+                  <div class="status-chip">{{ appointment.status }}</div>
+                </td>
+                <td>
+                  <div class="entity-avatar">
+                    @if (appointment.pet?.photo_url) {
+                      <img [src]="appointment.pet?.photo_url!" [alt]="appointment.pet?.name || 'Mascota'" />
+                    }
+                    <div>
+                      <strong>{{ appointment.pet?.name }}</strong>
+                      <div class="muted">{{ appointment.pet?.client?.full_name }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="entity-avatar">
+                    @if (appointment.veterinarian?.photo_url) {
+                      <img
+                        [src]="appointment.veterinarian?.photo_url!"
+                        [alt]="appointment.veterinarian?.full_name || 'Veterinario'"
+                      />
+                    }
+                    <div>{{ appointment.veterinarian?.full_name }}</div>
+                  </div>
+                </td>
+                <td>{{ getServiceNames(appointment) }}</td>
+                <td>
+                  <div class="action-row">
+                    <button type="button" class="secondary-button" (click)="edit(appointment)">Editar</button>
+                    <button type="button" class="danger-button" (click)="remove(appointment)">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)" />
+    }
   </div>
 </section>
+
+<app-entity-selector-modal
+  [open]="petSelectorOpen()"
+  title="Seleccionar mascota"
+  subtitle="Busca por nombre, especie o cliente"
+  [items]="petOptions()"
+  [columns]="petColumns"
+  [pagination]="petPagination()"
+  [loading]="petLoading()"
+  [search]="petSearch()"
+  imageKey="photo_url"
+  (close)="closePetSelector()"
+  (searchChange)="onPetSearchChange($event)"
+  (pageChange)="onPetPageChange($event)"
+  (select)="selectPet($event)"
+/>
+
+<app-entity-selector-modal
+  [open]="veterinarianSelectorOpen()"
+  title="Seleccionar veterinario"
+  subtitle="Busca por nombre, especialidad o licencia"
+  [items]="veterinarianOptions()"
+  [columns]="veterinarianColumns"
+  [pagination]="veterinarianPagination()"
+  [loading]="veterinarianLoading()"
+  [search]="veterinarianSearch()"
+  imageKey="photo_url"
+  (close)="closeVeterinarianSelector()"
+  (searchChange)="onVeterinarianSearchChange($event)"
+  (pageChange)="onVeterinarianPageChange($event)"
+  (select)="selectVeterinarian($event)"
+/>

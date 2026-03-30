@@ -1,91 +1,56 @@
 <?php
+
 namespace App\Services;
 
-use App\Models\Admin;
-use App\Models\Cashier;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-    private function login($email, $password)
+    public function register(array $payload): array
     {
-        try {
-            $user = User::where('email', $email)
-                ->where('deleted_at', null)
-                ->where('is_active', true)
-                ->first();
-        
-            if (!$user || !Hash::check($password, $user->password)) {
-                throw ValidationException::withMessages([
-                    'email' => ['Credenciales incorrectas.'],
-                ]);
-            }
-
-            $token = $user->createToken('api_token')->plainTextToken;
-
-            return [
-                'user' => $user,
-                'token' => $token
-            ];
-        } catch (ValidationException $th) {
-            throw $th;
-        }
-    }
-
-    public function loginInventory(string $email, string $password): array
-    {
-        $login = $this->login($email, $password);
-        $user = $login['user']->load(['branch', 'managedPointsOfSale']);
+        $user = User::create([
+            'name' => $payload['name'],
+            'email' => $payload['email'],
+            'phone' => $payload['phone'] ?? null,
+            'role' => $payload['role'] ?? User::ROLE_ADMIN,
+            'password' => $payload['password'],
+            'is_active' => true,
+        ]);
 
         return [
             'user' => $user,
-            'token' => $login['token']
+            'token' => $user->createToken('spa-token')->plainTextToken,
         ];
     }
 
-    private function getTypeUser($typeUser, $userId): mixed 
+    public function login(array $payload): array
     {
-        switch ($typeUser) {
-            case 'admin':
-                return Admin::where('user_id', $userId)->firstOrFail();
-            case 'cashier':
-                return Cashier::where('user_id', $userId)->firstOrFail();
-            default:
-                return null;
+        $user = User::query()->where('email', $payload['email'])->first();
+
+        if (! $user || ! Hash::check($payload['password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['Las credenciales proporcionadas son incorrectas.'],
+            ]);
         }
+
+        if (! $user->is_active) {
+            throw ValidationException::withMessages([
+                'email' => ['El usuario se encuentra inactivo.'],
+            ]);
+        }
+
+        $user->tokens()->delete();
+
+        return [
+            'user' => $user,
+            'token' => $user->createToken('spa-token')->plainTextToken,
+        ];
     }
 
-    public function loginAdmin($email, $password)
+    public function logout(User $user): void
     {
-        try {
-            $login = $this->login($email, $password, 'admin');
-            $user = $login['user'];
-            
-            return [
-                'user' => $user,
-                'admin' => $this->getTypeUser('admin', $user->id),
-                'token' => $login['token']
-            ];
-        } catch (ValidationException $th) {
-            throw $th;
-        }
-    }
-    
-    public function loginCashier($email, $password)
-    {
-        try {
-            $login = $this->login($email, $password, 'admin');
-            $user = $login['user'];
-
-            return [
-                'user' => $user,
-                'cashier' => $this->getTypeUser('cashier', $user->id),
-                'token' => $login['token']
-            ];
-        } catch (ValidationException $th) {
-            throw $th;
-        }
+        $user->currentAccessToken()?->delete();
     }
 }

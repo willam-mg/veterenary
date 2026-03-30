@@ -1,0 +1,135 @@
+<section class="page-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h1>Veterinarios</h1>
+        <p class="panel-subtitle">CRUD completo con fotografía y gestión preparada para escala.</p>
+      </div>
+    </div>
+
+    @if (message()) {
+      <div class="message success">{{ message() }}</div>
+    }
+    @if (error()) {
+      <div class="message error">{{ error() }}</div>
+    }
+
+    <form class="form-grid" [formGroup]="veterinarianForm" (ngSubmit)="submit()">
+      <label class="form-field">
+        <span>Nombres</span>
+        <input type="text" formControlName="first_name" />
+      </label>
+      <label class="form-field">
+        <span>Apellidos</span>
+        <input type="text" formControlName="last_name" />
+      </label>
+      <label class="form-field">
+        <span>Email</span>
+        <input type="email" formControlName="email" />
+      </label>
+      <label class="form-field">
+        <span>Teléfono</span>
+        <input type="text" formControlName="phone" />
+      </label>
+      <label class="form-field">
+        <span>Número de licencia</span>
+        <input type="text" formControlName="license_number" />
+      </label>
+      <label class="form-field">
+        <span>Especialidad</span>
+        <input type="text" formControlName="specialty" />
+      </label>
+      <label class="form-field">
+        <span>Fotografía</span>
+        <input type="file" accept="image/*" (change)="onPhotoSelected($event)" />
+      </label>
+      <div class="form-field">
+        <span>Vista previa</span>
+        <div class="selector-pill">
+          @if (photoPreview()) {
+            <img [src]="photoPreview()!" alt="Foto veterinario" />
+          } @else {
+            <span>Sin foto</span>
+          }
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button type="submit" class="primary-button" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : editingId() ? 'Actualizar veterinario' : 'Crear veterinario' }}
+        </button>
+        @if (editingId()) {
+          <button type="button" class="secondary-button" (click)="cancelEdit()">Cancelar edición</button>
+        }
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Equipo veterinario</h2>
+        <p class="panel-subtitle">Busca por nombre, licencia o especialidad.</p>
+      </div>
+      <div class="toolbar-row">
+        <input
+          type="search"
+          [value]="search()"
+          (input)="onSearchChange($any($event.target).value)"
+          placeholder="Buscar veterinario"
+        />
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="empty-state">Cargando veterinarios...</p>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Veterinario</th>
+              <th>Contacto</th>
+              <th>Especialidad</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (veterinarian of veterinarians(); track veterinarian.id) {
+              <tr>
+                <td>
+                  <div class="entity-avatar">
+                    @if (veterinarian.photo_url) {
+                      <img [src]="veterinarian.photo_url" [alt]="veterinarian.full_name" />
+                    }
+                    <div>
+                      <strong>{{ veterinarian.full_name }}</strong>
+                      <div class="muted">{{ veterinarian.license_number }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div>{{ veterinarian.email }}</div>
+                  <div class="muted">{{ veterinarian.phone || 'Sin teléfono' }}</div>
+                </td>
+                <td>{{ veterinarian.specialty || 'General' }}</td>
+                <td>
+                  <div class="action-row">
+                    <button type="button" class="secondary-button" (click)="edit(veterinarian)">
+                      Editar
+                    </button>
+                    <button type="button" class="danger-button" (click)="remove(veterinarian)">
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)" />
+    }
+  </div>
+</section>

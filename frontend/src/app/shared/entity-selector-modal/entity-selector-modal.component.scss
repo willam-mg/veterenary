@@ -1,0 +1,27 @@
+:host {
+  display: contents;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 32, 28, 0.48);
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  z-index: 30;
+}
+
+.modal-card {
+  width: min(1000px, 100%);
+  max-height: calc(100vh - 3rem);
+  overflow: auto;
+}
+
+.toolbar-row {
+  margin-bottom: 1rem;
+}
+
+.toolbar-row input {
+  width: min(320px, 100%);
+}

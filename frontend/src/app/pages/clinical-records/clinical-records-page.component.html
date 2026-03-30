@@ -1,0 +1,215 @@
+<section class="page-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h1>Historial clínico</h1>
+        <p class="panel-subtitle">Registro clínico con adjunto opcional y selectores avanzados.</p>
+      </div>
+    </div>
+
+    @if (message()) {
+      <div class="message success">{{ message() }}</div>
+    }
+    @if (error()) {
+      <div class="message error">{{ error() }}</div>
+    }
+
+    <form class="form-grid" [formGroup]="recordForm" (ngSubmit)="submit()">
+      <div class="form-field full">
+        <span>Mascota</span>
+        @if (selectedPet(); as pet) {
+          <div class="selector-pill">
+            @if (pet.photo_url) {
+              <img [src]="pet.photo_url" [alt]="pet.name" />
+            }
+            <div>
+              <strong>{{ pet.name }}</strong>
+              <div class="muted">{{ pet.client?.full_name || 'Sin cliente' }}</div>
+            </div>
+          </div>
+        } @else {
+          <div class="selector-pill"><span>Sin mascota seleccionada</span></div>
+        }
+        <div class="action-row">
+          <button type="button" class="secondary-button" (click)="openPetSelector()">
+            Seleccionar mascota
+          </button>
+        </div>
+      </div>
+
+      <div class="form-field full">
+        <span>Veterinario</span>
+        @if (selectedVeterinarian(); as veterinarian) {
+          <div class="selector-pill">
+            @if (veterinarian.photo_url) {
+              <img [src]="veterinarian.photo_url" [alt]="veterinarian.full_name" />
+            }
+            <div>
+              <strong>{{ veterinarian.full_name }}</strong>
+              <div class="muted">{{ veterinarian.specialty || 'General' }}</div>
+            </div>
+          </div>
+        } @else {
+          <div class="selector-pill"><span>Sin veterinario asignado</span></div>
+        }
+        <div class="action-row">
+          <button type="button" class="secondary-button" (click)="openVeterinarianSelector()">
+            Seleccionar veterinario
+          </button>
+        </div>
+      </div>
+
+      <label class="form-field">
+        <span>Cita</span>
+        <select formControlName="appointment_id">
+          <option [value]="0">Sin cita</option>
+          @for (appointment of appointments(); track appointment.id) {
+            <option [value]="appointment.id">
+              #{{ appointment.id }} · {{ appointment.pet?.name }} · {{ appointment.scheduled_at | date: 'dd/MM' }}
+            </option>
+          }
+        </select>
+      </label>
+      <label class="form-field">
+        <span>Fecha</span>
+        <input type="date" formControlName="record_date" data-testid="record-date" />
+      </label>
+      <label class="form-field full">
+        <span>Diagnóstico</span>
+        <textarea rows="3" formControlName="diagnosis" data-testid="record-diagnosis"></textarea>
+      </label>
+      <label class="form-field full">
+        <span>Tratamiento</span>
+        <textarea rows="3" formControlName="treatment"></textarea>
+      </label>
+      <label class="form-field full">
+        <span>Observaciones</span>
+        <textarea rows="3" formControlName="observations"></textarea>
+      </label>
+      <label class="form-field">
+        <span>Peso</span>
+        <input type="number" formControlName="weight" />
+      </label>
+      <label class="form-field">
+        <span>Adjunto opcional</span>
+        <input type="file" accept=".jpg,.jpeg,.png,.pdf" (change)="onAttachmentSelected($event)" />
+      </label>
+      <div class="form-field">
+        <span>Archivo</span>
+        <div class="selector-pill">
+          <span>{{ attachmentName() || 'Sin adjunto' }}</span>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button type="submit" class="primary-button" data-testid="record-submit" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : editingId() ? 'Actualizar historial' : 'Crear historial' }}
+        </button>
+        @if (editingId()) {
+          <button type="button" class="secondary-button" (click)="cancelEdit()">Cancelar edición</button>
+        }
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Registros</h2>
+        <p class="panel-subtitle">Filtra por diagnóstico, mascota o veterinario.</p>
+      </div>
+      <div class="toolbar-row">
+        <input
+          type="search"
+          [value]="search()"
+          (input)="onSearchChange($any($event.target).value)"
+          placeholder="Buscar historiales"
+        />
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="empty-state">Cargando historiales...</p>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Mascota</th>
+              <th>Diagnóstico</th>
+              <th>Adjunto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (record of records(); track record.id) {
+              <tr>
+                <td>{{ record.record_date | date: 'dd/MM/yyyy' }}</td>
+                <td>
+                  <div class="entity-avatar">
+                    @if (record.pet?.photo_url) {
+                      <img [src]="record.pet?.photo_url!" [alt]="record.pet?.name || 'Mascota'" />
+                    }
+                    <div>
+                      <strong>{{ record.pet?.name }}</strong>
+                      <div class="muted">{{ record.veterinarian?.full_name || 'Sin veterinario' }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ record.diagnosis }}</td>
+                <td>
+                  @if (record.attachment_url) {
+                    <a [href]="record.attachment_url" target="_blank" rel="noreferrer">Ver adjunto</a>
+                  } @else {
+                    <span class="muted">Sin adjunto</span>
+                  }
+                </td>
+                <td>
+                  <div class="action-row">
+                    <button type="button" class="secondary-button" (click)="edit(record)">Editar</button>
+                    <button type="button" class="danger-button" (click)="remove(record)">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)" />
+    }
+  </div>
+</section>
+
+<app-entity-selector-modal
+  [open]="petSelectorOpen()"
+  title="Seleccionar mascota"
+  subtitle="Busca por nombre, especie o cliente"
+  [items]="petOptions()"
+  [columns]="petColumns"
+  [pagination]="petPagination()"
+  [loading]="petLoading()"
+  [search]="petSearch()"
+  imageKey="photo_url"
+  (close)="closePetSelector()"
+  (searchChange)="onPetSearchChange($event)"
+  (pageChange)="onPetPageChange($event)"
+  (select)="selectPet($event)"
+/>
+
+<app-entity-selector-modal
+  [open]="veterinarianSelectorOpen()"
+  title="Seleccionar veterinario"
+  subtitle="Busca por nombre, especialidad o licencia"
+  [items]="veterinarianOptions()"
+  [columns]="veterinarianColumns"
+  [pagination]="veterinarianPagination()"
+  [loading]="veterinarianLoading()"
+  [search]="veterinarianSearch()"
+  imageKey="photo_url"
+  (close)="closeVeterinarianSelector()"
+  (searchChange)="onVeterinarianSearchChange($event)"
+  (pageChange)="onVeterinarianPageChange($event)"
+  (select)="selectVeterinarian($event)"
+/>

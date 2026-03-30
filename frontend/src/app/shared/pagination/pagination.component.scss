@@ -1,0 +1,22 @@
+:host {
+  display: block;
+}
+
+.pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.pagination-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.page-indicator {
+  font-weight: 600;
+}
