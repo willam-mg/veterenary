@@ -1,6 +1,6 @@
 # Automation
 
-Framework de automatización UI y API para `VetClinic Demo` usando Playwright.
+Framework de automatizacion UI y API para `VetClinic Demo` usando Playwright.
 
 ## Alcance
 
@@ -10,24 +10,24 @@ Este proyecto cubre:
 - pruebas `api`
 - pruebas `e2e`
 - pruebas `regression`
-- Page Object Model para los módulos principales del sistema
+- Page Object Model para los modulos principales del sistema
 
 ## Estructura
 
 ```text
 automation/
-├─ config/
-├─ data/
-├─ fixtures/
-├─ pages/
-├─ tests/
-│  ├─ api/
-│  ├─ smoke/
-│  ├─ e2e/
-│  └─ regression/
-├─ utils/
-├─ package.json
-└─ playwright.config.ts
+|-- config/
+|-- data/
+|-- fixtures/
+|-- pages/
+|-- tests/
+|   |-- api/
+|   |-- smoke/
+|   |-- e2e/
+|   `-- regression/
+|-- utils/
+|-- package.json
+`-- playwright.config.ts
 ```
 
 ## Requisitos
@@ -37,9 +37,9 @@ automation/
 - Frontend levantado en `http://localhost:4200`
 - Backend levantado en `http://localhost:8000`
 
-## Instalación
+## Instalacion
 
-Desde la raíz del repo:
+Desde la raiz del repo:
 
 ```powershell
 cd automation
@@ -76,7 +76,7 @@ $env:DEMO_USER_EMAIL="admin@vetdemo.test"
 $env:DEMO_USER_PASSWORD="password"
 ```
 
-## Ejecución
+## Ejecucion
 
 Ejecutar toda la suite:
 
@@ -99,7 +99,7 @@ Listar casos detectados:
 npx.cmd playwright test --list
 ```
 
-Ejecutar una carpeta específica:
+Ejecutar una carpeta especifica:
 
 ```powershell
 npx.cmd playwright test tests/smoke
@@ -132,14 +132,15 @@ npx.cmd playwright test --headed
 
 ## CI/CD
 
-Este proyecto ya incluye integración para GitHub Actions y Jenkins.
+Este proyecto ya incluye integracion para GitHub Actions y Jenkins.
 
 ### GitHub Actions
 
-Los workflows de GitHub Actions viven en la raíz del repositorio:
+Los workflows de GitHub Actions viven en la raiz del repositorio:
 
 - `.github/workflows/automation-ci.yml`
 - `.github/workflows/automation-full.yml`
+- `.github/workflows/static.yml`
 
 Esto es obligatorio porque GitHub no detecta workflows dentro de `automation/.github/workflows`.
 
@@ -171,7 +172,18 @@ Objetivo:
 
 - correr `e2e`
 - correr `regression`
-- permitir ejecución manual de `e2e`, `regression` o `all`
+- permitir ejecucion manual de `e2e`, `regression` o `all`
+- generar `allure-report`
+- subir el artifact `static-allure-report`
+
+#### `static.yml`
+
+Es el workflow dedicado a GitHub Pages.
+
+Objetivo:
+
+- descargar el artifact `static-allure-report` generado por `automation-full.yml`
+- publicar el contenido estatico en GitHub Pages
 
 #### Variables recomendadas en GitHub
 
@@ -198,7 +210,7 @@ Eso sirve para un entorno self-hosted o una infraestructura donde esas URLs exis
 
 ### Jenkins
 
-Se agregó un pipeline declarativo en:
+Se agrego un pipeline declarativo en:
 
 - `automation/Jenkinsfile`
 
@@ -212,7 +224,7 @@ Para usarlo en Jenkins:
 automation/Jenkinsfile
 ```
 
-#### Parámetros del pipeline
+#### Parametros del pipeline
 
 - `SUITE`
 - `WEB_BASE_URL`
@@ -220,13 +232,13 @@ automation/Jenkinsfile
 - `DEMO_USER_EMAIL`
 - `DEMO_USER_PASSWORD`
 
-#### Qué hace el pipeline
+#### Que hace el pipeline
 
 - checkout del repositorio
 - `npm ci`
-- instalación de navegadores Playwright
-- ejecución de la suite elegida
-- generación de reporte Allure
+- instalacion de navegadores Playwright
+- ejecucion de la suite elegida
+- generacion de reporte Allure
 - archivado de `reports/` y `test-results/`
 
 #### Suites disponibles en Jenkins
@@ -239,12 +251,12 @@ automation/Jenkinsfile
 
 ### Consideraciones de infraestructura
 
-Los pipelines no levantan automáticamente `frontend` y `backend`. Actualmente asumen una de estas dos opciones:
+Los pipelines no levantan automaticamente `frontend` y `backend`. Actualmente asumen una de estas dos opciones:
 
 - que ya existe un ambiente accesible por URL
 - que vas a extender el pipeline para arrancar los servicios antes de correr las pruebas
 
-Si luego quieres pipeline full local, el siguiente paso sería agregar stages para:
+Si luego quieres pipeline full local, el siguiente paso seria agregar stages para:
 
 - levantar backend Laravel
 - levantar frontend Angular
@@ -263,24 +275,22 @@ npm install -D allure-playwright allure-commandline
 
 ### 2. Configurar Playwright
 
-Actualiza `playwright.config.ts` para agregar Allure al reporter:
+El proyecto ya esta configurado para generar:
 
-```ts
-reporter: [
-  ['html'],
-  ['allure-playwright'],
-],
-```
+- reporte HTML de Playwright
+- resultados de Allure
+- reporte JUnit para Jenkins
 
-Si quieres definir la carpeta de resultados:
+Los outputs principales son:
 
-```powershell
-$env:ALLURE_RESULTS_DIR="allure-results"
-```
+- `reports/html-report`
+- `reports/allure-results`
+- `reports/allure-report`
+- `test-results/results.xml`
 
 ### 3. Ejecutar pruebas con Allure
 
-Después de correr las pruebas, Playwright generará resultados en `allure-results/`.
+Despues de correr las pruebas, Playwright genera resultados en `reports/allure-results`.
 
 Ejemplo:
 
@@ -290,23 +300,90 @@ npx.cmd playwright test tests/smoke
 
 ### 4. Generar reporte Allure
 
-Generar reporte estático:
+Generar reporte estatico:
 
 ```powershell
-npx.cmd allure generate allure-results --clean -o allure-report
+npx.cmd allure generate reports/allure-results --clean -o reports/allure-report
 ```
 
 Abrir reporte generado:
 
 ```powershell
-npx.cmd allure open allure-report
+npx.cmd allure open reports/allure-report
 ```
 
 Generar y servir el reporte en un solo paso:
 
 ```powershell
-npx.cmd allure serve allure-results
+npx.cmd allure serve reports/allure-results
 ```
+
+## Publicacion de Allure en GitHub Pages
+
+La carpeta publicada sigue siendo:
+
+```text
+automation/reports/allure-report
+```
+
+Pero la publicacion automatica no depende de commitear esa carpeta.
+
+### Flujo correcto
+
+1. `Automation Full Regression` ejecuta tests en GitHub Actions.
+2. Ese workflow genera `automation/reports/allure-report`.
+3. Ese workflow sube el artifact `static-allure-report`.
+4. `static.yml` descarga ese artifact generado en GitHub.
+5. GitHub Pages publica ese contenido estatico.
+
+Con este modelo:
+
+- `allure-report` puede seguir en `.gitignore`
+- no necesitas commitear archivos generados
+- GitHub Pages publica el reporte generado por CI
+
+### Configuracion requerida en GitHub
+
+1. Ve a `Settings` del repositorio.
+2. Abre `Pages`.
+3. En `Build and deployment`, selecciona:
+
+```text
+Source: GitHub Actions
+```
+
+### Como ejecutarlo
+
+Automatica:
+
+- ejecuta `Automation Full Regression`
+- al completarse con exito, `static.yml` descarga el artifact `static-allure-report`
+- luego publica ese artifact en GitHub Pages
+
+Manual:
+
+1. Entra a la pestana `Actions` del repositorio.
+2. Abre `Publish Static Allure Report`.
+3. Pulsa `Run workflow`.
+4. Este modo manual usa la carpeta local del checkout, por lo que requiere que `automation/reports/allure-report/index.html` exista en la rama publicada.
+
+### Donde ver el reporte
+
+Una vez finalice el deploy, GitHub Pages publicara el reporte en una URL como:
+
+```text
+https://<owner>.github.io/<repo>/
+```
+
+Ademas, el job expone la URL publicada en el environment `github-pages`.
+
+### Consideraciones
+
+- La publicacion automatica ya no depende de archivos versionados en git.
+- `static.yml` publica el artifact generado por `Automation Full Regression`.
+- Si ejecutas `static.yml` manualmente, si depende de que exista `automation/reports/allure-report/index.html` en el checkout.
+- GitHub Pages publica el contenido estatico del reporte Allure, no el historial completo de Allure TestOps.
+- `static.yml` es el workflow dedicado a publicacion; los workflows de `automation` se encargan del CI.
 
 ## Flujo recomendado
 
@@ -316,19 +393,19 @@ Desarrollo local:
 npm run test:smoke
 ```
 
-Validación funcional:
+Validacion funcional:
 
 ```powershell
 npm run test:e2e
 ```
 
-Validación de API:
+Validacion de API:
 
 ```powershell
 npm run test:api
 ```
 
-Validación completa antes de release:
+Validacion completa antes de release:
 
 ```powershell
 npm test
@@ -336,7 +413,7 @@ npm test
 
 ## Notas
 
-- En PowerShell, usa `npx.cmd` en lugar de `npx` si la política de ejecución bloquea scripts `.ps1`.
+- En PowerShell, usa `npx.cmd` en lugar de `npx` si la politica de ejecucion bloquea scripts `.ps1`.
 - Las suites autenticadas usan el usuario demo configurado en `config/env.ts`.
-- Los tests de UI dependen de que frontend y backend estén disponibles.
-- Los tests API dependen de que el backend tenga datos demo y autenticación funcional.
+- Los tests de UI dependen de que frontend y backend esten disponibles.
+- Los tests API dependen de que el backend tenga datos demo y autenticacion funcional.

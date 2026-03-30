@@ -1,0 +1,66 @@
+name: Publish Static Allure Report
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Automation Full Regression']
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy-pages:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download Allure report artifact from automation workflow
+        if: ${{ github.event_name == 'workflow_run' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: static-allure-report
+          path: ./site
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Checkout repository for manual publishing
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/checkout@v4
+
+      - name: Copy local report for manual publishing
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        shell: bash
+        run: |
+          if [ ! -f automation/reports/allure-report/index.html ]; then
+            echo "Expected file not found: automation/reports/allure-report/index.html"
+            exit 1
+          fi
+          mkdir -p site
+          cp -R automation/reports/allure-report/. site/
+
+      - name: Validate site content
+        shell: bash
+        run: |
+          if [ ! -f site/index.html ]; then
+            echo "Expected file not found: site/index.html"
+            exit 1
+          fi
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
