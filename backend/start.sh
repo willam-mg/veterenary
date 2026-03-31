@@ -4,8 +4,6 @@ set -e
 echo "APP_ENV=$APP_ENV"
 echo "PORT=$PORT"
 
-php artisan key:generate
-
 echo "Clearing Laravel caches..."
 php artisan config:clear || true
 php artisan cache:clear || true
@@ -13,10 +11,10 @@ php artisan route:clear || true
 php artisan view:clear || true
 
 # IMPORTANTE: generar APP_KEY si no existe
-# if [ -z "$APP_KEY" ]; then
-#   echo "APP_KEY not found, generating..."
-#   php artisan key:generate --force
-# fi
+if [ -z "$APP_KEY" ]; then
+  echo "APP_KEY not found, generating..."
+  php artisan key:generate --force
+fi
 
 echo "Running database migrations..."
 php artisan migrate --force
