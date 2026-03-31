@@ -40,7 +40,10 @@ RUN composer install \
     --prefer-dist \
     --optimize-autoloader \
     --no-dev \
-    -vvv
+    --no-scripts
+
+# Copia el resto del proyecto
+COPY . .
 
 RUN chmod -R 775 storage bootstrap/cache \
     && chmod +x /app/start.sh
