@@ -32,7 +32,7 @@ jobs:
 
       - name: Checkout repository for manual publishing
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Copy local report for manual publishing
         if: ${{ github.event_name == 'workflow_dispatch' }}

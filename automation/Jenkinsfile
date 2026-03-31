@@ -8,8 +8,9 @@ pipeline {
 
   parameters {
     choice(name: 'SUITE', choices: ['smoke', 'api', 'e2e', 'regression', 'all'], description: 'Suite to execute')
-    string(name: 'WEB_BASE_URL', defaultValue: 'http://localhost:4200', description: 'Frontend base URL')
-    string(name: 'API_BASE_URL', defaultValue: 'http://localhost:8000/api/v1', description: 'Backend API base URL')
+    choice(name: 'TARGET_ENVIRONMENT', choices: ['qa', 'staging', 'production'], description: 'Execution environment')
+    string(name: 'WEB_BASE_URL', defaultValue: '', description: 'Optional frontend base URL override')
+    string(name: 'API_BASE_URL', defaultValue: '', description: 'Optional backend API base URL override')
     string(name: 'DEMO_USER_EMAIL', defaultValue: 'admin@vetdemo.test', description: 'Demo user email')
     password(name: 'DEMO_USER_PASSWORD', defaultValue: 'password', description: 'Demo user password')
   }
@@ -62,8 +63,11 @@ pipeline {
         dir('automation') {
           script {
             withEnv([
+              "TEST_ENV=${params.TARGET_ENVIRONMENT}",
               "WEB_BASE_URL=${params.WEB_BASE_URL}",
               "API_BASE_URL=${params.API_BASE_URL}",
+              'STAGING_WEB_BASE_URL=https://veterenary-production.up.railway.app',
+              'STAGING_API_BASE_URL=https://veterenary-production.up.railway.app/api/v1',
               "DEMO_USER_EMAIL=${params.DEMO_USER_EMAIL}",
               "DEMO_USER_PASSWORD=${params.DEMO_USER_PASSWORD}"
             ]) {

@@ -14,6 +14,15 @@ on:
           - e2e
           - regression
           - all
+      target_environment:
+        description: Target environment for full suite
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+          - qa
 
 jobs:
   full-suite:
@@ -26,18 +35,21 @@ jobs:
 
     env:
       CI: true
-      WEB_BASE_URL: ${{ vars.WEB_BASE_URL || 'http://localhost:4200' }}
-      API_BASE_URL: ${{ vars.API_BASE_URL || 'http://localhost:8000/api/v1' }}
+      TEST_ENV: ${{ github.event.inputs.target_environment || 'staging' }}
+      STAGING_WEB_BASE_URL: ${{ vars.STAGING_WEB_BASE_URL || 'https://veterenary-production.up.railway.app' }}
+      STAGING_API_BASE_URL: ${{ vars.STAGING_API_BASE_URL || 'https://veterenary-production.up.railway.app/api/v1' }}
+      PRODUCTION_WEB_BASE_URL: ${{ vars.PRODUCTION_WEB_BASE_URL || '' }}
+      PRODUCTION_API_BASE_URL: ${{ vars.PRODUCTION_API_BASE_URL || '' }}
       DEMO_USER_EMAIL: ${{ secrets.DEMO_USER_EMAIL || 'admin@vetdemo.test' }}
       DEMO_USER_PASSWORD: ${{ secrets.DEMO_USER_PASSWORD || 'password' }}
       SELECTED_SUITE: ${{ github.event.inputs.suite || 'all' }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm

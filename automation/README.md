@@ -60,16 +60,34 @@ npx.cmd playwright install --with-deps
 
 ## Variables de entorno
 
-Este proyecto usa estos valores por defecto:
+Este proyecto soporta estos ambientes:
 
-- `WEB_BASE_URL=http://localhost:4200`
-- `API_BASE_URL=http://localhost:8000/api/v1`
+- `qa`
+- `staging`
+- `production`
+
+Resolucion base:
+
+- `qa`
+  - `WEB_BASE_URL=http://localhost:4200`
+  - `API_BASE_URL=http://localhost:8000/api/v1`
+- `staging`
+  - `STAGING_WEB_BASE_URL=https://veterenary-production.up.railway.app`
+  - `STAGING_API_BASE_URL=https://veterenary-production.up.railway.app/api/v1`
+- `production`
+  - `PRODUCTION_WEB_BASE_URL`
+  - `PRODUCTION_API_BASE_URL`
+
+Ademas:
+
+- `TEST_ENV=qa|staging|production`
 - `DEMO_USER_EMAIL=admin@vetdemo.test`
 - `DEMO_USER_PASSWORD=password`
 
-Puedes sobreescribirlos antes de ejecutar pruebas:
+Puedes sobreescribirlos antes de ejecutar pruebas locales:
 
 ```powershell
+$env:TEST_ENV="qa"
 $env:WEB_BASE_URL="http://localhost:4200"
 $env:API_BASE_URL="http://localhost:8000/api/v1"
 $env:DEMO_USER_EMAIL="admin@vetdemo.test"
@@ -158,6 +176,7 @@ Objetivo:
 - correr `api`
 - subir artifacts de Playwright
 - subir resultados de Allure
+- usar `staging` por defecto en GitHub Actions
 
 Este workflow usa `working-directory: automation`.
 
@@ -173,6 +192,7 @@ Objetivo:
 - correr `e2e`
 - correr `regression`
 - permitir ejecucion manual de `e2e`, `regression` o `all`
+- permitir seleccion manual de `staging`, `production` o `qa`
 - generar `allure-report`
 - subir el artifact `static-allure-report`
 
@@ -191,8 +211,10 @@ Configura estas variables y secretos en el repositorio:
 
 Variables:
 
-- `WEB_BASE_URL`
-- `API_BASE_URL`
+- `STAGING_WEB_BASE_URL`
+- `STAGING_API_BASE_URL`
+- `PRODUCTION_WEB_BASE_URL`
+- `PRODUCTION_API_BASE_URL`
 
 Secrets:
 
@@ -201,12 +223,12 @@ Secrets:
 
 Si no se configuran, los workflows usan estos defaults:
 
-- `http://localhost:4200`
-- `http://localhost:8000/api/v1`
+- staging web: `https://veterenary-production.up.railway.app`
+- staging api: `https://veterenary-production.up.railway.app/api/v1`
 - `admin@vetdemo.test`
 - `password`
 
-Eso sirve para un entorno self-hosted o una infraestructura donde esas URLs existan. En GitHub-hosted runners normalmente debes apuntar a ambientes desplegados.
+GitHub Actions queda orientado a `staging` por defecto. `qa` es el ambiente local por defecto para ejecucion manual o Jenkins. `production` debe configurarse con variables del repositorio antes de usarlo.
 
 ### Jenkins
 
@@ -227,6 +249,7 @@ automation/Jenkinsfile
 #### Parametros del pipeline
 
 - `SUITE`
+- `TARGET_ENVIRONMENT`
 - `WEB_BASE_URL`
 - `API_BASE_URL`
 - `DEMO_USER_EMAIL`
@@ -237,6 +260,7 @@ automation/Jenkinsfile
 - checkout del repositorio
 - `npm ci`
 - instalacion de navegadores Playwright
+- seleccion de ambiente `qa`, `staging` o `production`
 - ejecucion de la suite elegida
 - generacion de reporte Allure
 - archivado de `reports/` y `test-results/`
