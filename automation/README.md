@@ -441,3 +441,26 @@ npm test
 - Las suites autenticadas usan el usuario demo configurado en `config/env.ts`.
 - Los tests de UI dependen de que frontend y backend esten disponibles.
 - Los tests API dependen de que el backend tenga datos demo y autenticacion funcional.
+
+
+## install MCP playwrigth
+
+1. Necesitas:
+- Node.js
+- Codex CLI
+- Playwright MCP
+
+2. Instalar todo execute this command
+
+```
+npm install @playwright/mcp@latest
+```
+
+3. Registrar Playwright como MCP en Codex
+
+```
+codex mcp add playwright -- npx @playwright/mcp@latest
+```
+
+
+
