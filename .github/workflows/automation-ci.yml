@@ -13,13 +13,7 @@ on:
     branches:
       - main
       - develop
-      
-    
-    paths:
-      - 'automation/**'
-      - '.github/workflows/automation-ci.yml'
-  pull_request:
-    branches: [main, master]
+      - master
     paths:
       - 'automation/**'
       - '.github/workflows/automation-ci.yml'
