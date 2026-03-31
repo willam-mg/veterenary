@@ -2,7 +2,6 @@ FROM php:8.3-cli
 
 WORKDIR /app
 
-# Instala paquetes del sistema y extensiones necesarias de PHP
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -31,23 +30,18 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Instala Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copia primero composer para aprovechar cache
-COPY composer.json composer.lock ./
+# Copia todo el proyecto primero
+COPY . .
 
-# Instala dependencias PHP
 RUN composer install \
     --no-interaction \
     --prefer-dist \
     --optimize-autoloader \
-    --no-dev
+    --no-dev \
+    -vvv
 
-# Copia el resto del proyecto
-COPY . .
-
-# Permisos y script de arranque
 RUN chmod -R 775 storage bootstrap/cache \
     && chmod +x /app/start.sh
 
