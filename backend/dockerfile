@@ -42,7 +42,8 @@ RUN composer install \
     --no-interaction \
     --prefer-dist \
     --optimize-autoloader \
-    --no-dev
+    --no-dev \
+    --no-scripts
 
 # Copia el resto del proyecto
 COPY . .
