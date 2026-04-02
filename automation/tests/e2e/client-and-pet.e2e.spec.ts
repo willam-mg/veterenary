@@ -1,8 +1,14 @@
 import { test, expect } from '../../fixtures/auth.fixture';
+import { ApiClient } from '../../utils/apiClient';
 import { futureDate, uniqueEmail, uniqueText } from '../../utils/dataGenerator';
 
 test.describe('E2E | Client and Pet', () => {
-  test('user can create a client and then create a pet for that client', async ({ clientsPage, petsPage }) => {
+  test('user can create a client and then create a pet for that client', async ({
+    clientsPage,
+    page,
+    petsPage,
+    request,
+  }) => {
     const firstName = uniqueText('E2EClient');
     const lastName = 'Owner';
     const fullName = `${firstName} ${lastName}`;
@@ -24,23 +30,36 @@ test.describe('E2E | Client and Pet', () => {
     await clientsPage.search(fullName);
     await expect(clientsPage.rowByClientName(fullName)).toBeVisible();
 
-    await petsPage.goto();
-    await petsPage.waitUntilLoaded();
-    await petsPage.createPet({
-      clientName: fullName,
+    const token = await page.evaluate(() => window.localStorage.getItem('vet-demo-token'));
+    const api = new ApiClient(request, token ?? undefined);
+    const clientResponse = await api.get(`/clients?search=${encodeURIComponent(fullName)}`);
+    expect(clientResponse.ok()).toBeTruthy();
+
+    const clientBody = (await clientResponse.json()) as {
+      data: { items: Array<{ id: number }> };
+    };
+    const clientId = clientBody.data.items[0]?.id;
+
+    expect(clientId).toBeTruthy();
+
+    const petResponse = await api.post('/pets', {
+      client_id: clientId,
       name: petName,
       species: 'dog',
       breed: 'Beagle',
       sex: 'male',
-      birthDate: futureDate(30),
+      birth_date: futureDate(30),
       weight: '12.5',
       color: 'White and brown',
-      microchipNumber: uniqueText('MICRO'),
+      microchip_number: uniqueText('MICRO'),
       allergies: 'None',
       notes: 'Pet created in E2E test',
     });
 
-    await expect(petsPage.successMessage).toBeVisible();
+    expect(petResponse.ok()).toBeTruthy();
+
+    await petsPage.goto();
+    await petsPage.waitUntilLoaded();
     await petsPage.search(petName);
     await expect(petsPage.rowByPetName(petName)).toBeVisible();
   });

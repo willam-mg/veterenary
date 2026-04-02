@@ -1,5 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
+import { clickReliably } from '../../utils/interactions';
+
 export class EntitySelectorModalComponent {
   readonly backdrop: Locator;
   readonly modalCard: Locator;
@@ -25,7 +27,7 @@ export class EntitySelectorModalComponent {
   }
 
   async close(): Promise<void> {
-    await this.closeButton.click();
+    await clickReliably(this.closeButton);
     await expect(this.modalCard).toBeHidden();
   }
 
@@ -36,12 +38,12 @@ export class EntitySelectorModalComponent {
   async selectByText(value: string): Promise<void> {
     const row = this.rows.filter({ hasText: value }).first();
     await expect(row).toBeVisible({ timeout: 20000 });
-    await row.getByRole('button', { name: 'Seleccionar' }).click({ force: true });
+    await clickReliably(row.getByRole('button', { name: 'Seleccionar' }));
   }
 
   async selectFirst(): Promise<void> {
     const row = this.rows.first();
     await expect(row).toBeVisible({ timeout: 20000 });
-    await row.getByRole('button', { name: 'Seleccionar' }).click({ force: true });
+    await clickReliably(row.getByRole('button', { name: 'Seleccionar' }));
   }
 }

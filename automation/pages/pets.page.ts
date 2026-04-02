@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 import { routes, uiText } from '../config/constants';
+import { clickReliably } from '../utils/interactions';
 import { BasePage } from './base.page';
 import { EntitySelectorModalComponent } from './components/entity-selector-modal.component';
 
@@ -68,7 +69,7 @@ export class PetsPage extends BasePage {
   }
 
   async openClientSelector(): Promise<void> {
-    await this.selectClientButton.click();
+    await clickReliably(this.selectClientButton);
     await this.clientSelector.expectOpen();
   }
 
@@ -101,7 +102,7 @@ export class PetsPage extends BasePage {
       await this.photoInput.setInputFiles(input.photoPath);
     }
 
-    await this.submitButton.click();
+    await clickReliably(this.submitButton);
   }
 
   async search(term: string): Promise<void> {

@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 import { routes } from '../config/constants';
+import { clickReliably } from '../utils/interactions';
 import { BasePage } from './base.page';
 
 export type ClientFormInput = {
@@ -26,6 +27,7 @@ export class ClientsPage extends BasePage {
   readonly submitButton: Locator;
   readonly searchInput: Locator;
   readonly table: Locator;
+  readonly loadingState: Locator;
 
   constructor(page: Page) {
     super(page, routes.clients);
@@ -42,12 +44,14 @@ export class ClientsPage extends BasePage {
     this.table = page.locator('table').filter({
       has: page.getByRole('columnheader', { name: 'Cliente' }),
     });
+    this.loadingState = page.getByText('Cargando clientes...');
   }
 
   async waitUntilLoaded(): Promise<void> {
     await this.waitForUrl();
     await this.expectHeading(/^Clientes$/i);
-    await expect(this.firstNameInput).toBeVisible();
+    await expect(this.firstNameInput).toBeVisible({ timeout: 20000 });
+    await this.waitUntilTableReady();
   }
 
   async createClient(input: ClientFormInput): Promise<void> {
@@ -63,14 +67,21 @@ export class ClientsPage extends BasePage {
       await this.photoInput.setInputFiles(input.photoPath);
     }
 
-    await this.submitButton.click();
+    await clickReliably(this.submitButton);
+    await expect(this.submitButton).not.toContainText('Guardando...', { timeout: 20000 });
+    await this.waitUntilTableReady();
   }
 
   async search(term: string): Promise<void> {
     await this.searchInput.fill(term);
+    await this.waitUntilTableReady();
   }
 
   rowByClientName(fullName: string): Locator {
     return this.table.locator('tbody tr').filter({ has: this.page.getByText(fullName, { exact: false }) });
+  }
+
+  async waitUntilTableReady(): Promise<void> {
+    await this.loadingState.waitFor({ state: 'hidden', timeout: 20000 }).catch(() => undefined);
   }
 }

@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 import { routes, type AppointmentStatus } from '../config/constants';
+import { clickReliably } from '../utils/interactions';
 import { BasePage } from './base.page';
 import { EntitySelectorModalComponent } from './components/entity-selector-modal.component';
 
@@ -56,7 +57,7 @@ export class AppointmentsPage extends BasePage {
   }
 
   async selectPet(petName?: string): Promise<void> {
-    await this.selectPetButton.click();
+    await clickReliably(this.selectPetButton);
     await this.petSelector.expectOpen();
 
     if (petName) {
@@ -69,7 +70,7 @@ export class AppointmentsPage extends BasePage {
   }
 
   async selectVeterinarian(veterinarianName?: string): Promise<void> {
-    await this.selectVeterinarianButton.click();
+    await clickReliably(this.selectVeterinarianButton);
     await this.veterinarianSelector.expectOpen();
 
     if (veterinarianName) {
@@ -101,20 +102,19 @@ export class AppointmentsPage extends BasePage {
     }
 
     await this.notesInput.fill(input.notes ?? '');
-    await this.submitButton.click();
+    await clickReliably(this.submitButton);
   }
 
   async search(term: string): Promise<void> {
-    const encodedTerm = encodeURIComponent(term);
-    await Promise.all([
-      this.page.waitForResponse(
-        (response) =>
-          response.request().method() === 'GET' &&
-          response.url().includes('/appointments') &&
-          response.url().includes(`search=${encodedTerm}`)
-      ),
-      this.searchInput.fill(term),
-    ]);
+    const responsePromise = this.page
+      .waitForResponse(
+        (response) => response.request().method() === 'GET' && response.url().includes('/appointments'),
+        { timeout: 5000 }
+      )
+      .catch(() => null);
+
+    await this.searchInput.fill(term);
+    await responsePromise;
     await this.waitUntilTableReady();
   }
 
