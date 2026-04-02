@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 import { routes } from '../config/constants';
+import { clickReliably } from '../utils/interactions';
 import { BasePage } from './base.page';
 import { EntitySelectorModalComponent } from './components/entity-selector-modal.component';
 
@@ -31,6 +32,8 @@ export class ClinicalRecordsPage extends BasePage {
   readonly submitButton: Locator;
   readonly searchInput: Locator;
   readonly table: Locator;
+  readonly rows: Locator;
+  readonly loadingState: Locator;
 
   constructor(page: Page) {
     super(page, routes.clinicalRecords);
@@ -50,16 +53,19 @@ export class ClinicalRecordsPage extends BasePage {
     this.table = page.locator('table').filter({
       has: page.getByRole('columnheader', { name: 'Diagnóstico' }),
     });
+    this.rows = this.table.locator('tbody tr');
+    this.loadingState = page.getByText('Cargando historiales...');
   }
 
   async waitUntilLoaded(): Promise<void> {
     await this.waitForUrl();
     await this.expectHeading(/Historial cl[ií]nico/i);
     await expect(this.recordDateInput).toBeVisible();
+    await this.waitUntilTableReady();
   }
 
   async selectPet(petName?: string): Promise<void> {
-    await this.selectPetButton.click();
+    await clickReliably(this.selectPetButton);
     await this.petSelector.expectOpen();
 
     if (petName) {
@@ -72,7 +78,7 @@ export class ClinicalRecordsPage extends BasePage {
   }
 
   async selectVeterinarian(veterinarianName?: string): Promise<void> {
-    await this.selectVeterinarianButton.click();
+    await clickReliably(this.selectVeterinarianButton);
     await this.veterinarianSelector.expectOpen();
 
     if (veterinarianName) {
@@ -106,14 +112,27 @@ export class ClinicalRecordsPage extends BasePage {
       await this.attachmentInput.setInputFiles(input.attachmentPath);
     }
 
-    await this.submitButton.click();
+    await clickReliably(this.submitButton);
   }
 
   async search(term: string): Promise<void> {
+    const responsePromise = this.page
+      .waitForResponse(
+        (response) => response.request().method() === 'GET' && response.url().includes('/clinical-records'),
+        { timeout: 5000 }
+      )
+      .catch(() => null);
+
     await this.searchInput.fill(term);
+    await responsePromise;
+    await this.waitUntilTableReady();
   }
 
   rowByDiagnosis(text: string): Locator {
-    return this.table.locator('tbody tr').filter({ has: this.page.getByText(text, { exact: false }) });
+    return this.rows.filter({ has: this.page.getByText(text, { exact: false }) });
+  }
+
+  async waitUntilTableReady(): Promise<void> {
+    await this.loadingState.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => undefined);
   }
 }

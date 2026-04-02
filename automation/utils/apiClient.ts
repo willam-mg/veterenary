@@ -4,14 +4,17 @@ import { env } from '../config/env';
 import { loginByApi } from './authHelper';
 
 export class ApiClient {
-  constructor(private readonly request: APIRequestContext) {}
+  constructor(
+    private readonly request: APIRequestContext,
+    private readonly token?: string,
+  ) {}
 
   async authHeaders(): Promise<Record<string, string>> {
-    const session = await loginByApi(this.request);
+    const token = this.token ?? (await loginByApi(this.request)).token;
 
     return {
       Accept: 'application/json',
-      Authorization: `Bearer ${session.token}`,
+      Authorization: `Bearer ${token}`,
     };
   }
 

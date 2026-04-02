@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 import { routes, type AppointmentStatus } from '../config/constants';
+import { clickReliably } from '../utils/interactions';
 import { BasePage } from './base.page';
 import { EntitySelectorModalComponent } from './components/entity-selector-modal.component';
 
@@ -26,6 +27,8 @@ export class AppointmentsPage extends BasePage {
   readonly submitButton: Locator;
   readonly searchInput: Locator;
   readonly table: Locator;
+  readonly rows: Locator;
+  readonly loadingState: Locator;
 
   constructor(page: Page) {
     super(page, routes.appointments);
@@ -42,16 +45,19 @@ export class AppointmentsPage extends BasePage {
     this.table = page.locator('table').filter({
       has: page.getByRole('columnheader', { name: 'Mascota' }),
     });
+    this.rows = this.table.locator('tbody tr');
+    this.loadingState = page.getByText('Cargando agenda...');
   }
 
   async waitUntilLoaded(): Promise<void> {
     await this.waitForUrl();
     await this.expectHeading(/^Citas$/i);
     await expect(this.scheduledAtInput).toBeVisible();
+    await this.waitUntilTableReady();
   }
 
   async selectPet(petName?: string): Promise<void> {
-    await this.selectPetButton.click();
+    await clickReliably(this.selectPetButton);
     await this.petSelector.expectOpen();
 
     if (petName) {
@@ -64,7 +70,7 @@ export class AppointmentsPage extends BasePage {
   }
 
   async selectVeterinarian(veterinarianName?: string): Promise<void> {
-    await this.selectVeterinarianButton.click();
+    await clickReliably(this.selectVeterinarianButton);
     await this.veterinarianSelector.expectOpen();
 
     if (veterinarianName) {
@@ -96,14 +102,27 @@ export class AppointmentsPage extends BasePage {
     }
 
     await this.notesInput.fill(input.notes ?? '');
-    await this.submitButton.click();
+    await clickReliably(this.submitButton);
   }
 
   async search(term: string): Promise<void> {
+    const responsePromise = this.page
+      .waitForResponse(
+        (response) => response.request().method() === 'GET' && response.url().includes('/appointments'),
+        { timeout: 5000 }
+      )
+      .catch(() => null);
+
     await this.searchInput.fill(term);
+    await responsePromise;
+    await this.waitUntilTableReady();
+  }
+
+  async waitUntilTableReady(): Promise<void> {
+    await this.loadingState.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => undefined);
   }
 
   rowByAppointmentText(text: string): Locator {
-    return this.table.locator('tbody tr').filter({ has: this.page.getByText(text, { exact: false }) });
+    return this.rows.filter({ has: this.page.getByText(text, { exact: false }) });
   }
 }

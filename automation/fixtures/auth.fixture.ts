@@ -1,13 +1,21 @@
 import { test as base } from './test.fixture';
-
 import { env } from '../config/env';
+import { loginByApi } from '../utils/authHelper';
 
-export const test = base.extend({
+type AuthFixture = {
+  authenticated: void;
+};
+
+export const test = base.extend<AuthFixture>({
   authenticated: [
-    async ({ page, loginPage, appShell }, use) => {
-      await loginPage.goto();
-      await loginPage.waitUntilLoaded();
-      await loginPage.login(env.demoUserEmail, env.demoUserPassword);
+    async ({ page, request, appShell }, use) => {
+      const session = await loginByApi(request);
+
+      await page.addInitScript((token) => {
+        window.localStorage.setItem('vet-demo-token', token);
+      }, session.token);
+
+      await page.goto(env.webBaseUrl, { waitUntil: 'networkidle' });
       await appShell.expectAuthenticated();
       await use(undefined);
     },

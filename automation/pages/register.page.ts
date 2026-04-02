@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 import { routes } from '../config/constants';
+import { clickReliably } from '../utils/interactions';
 import { BasePage } from './base.page';
 
 export type RegisterUserInput = {
@@ -45,6 +46,6 @@ export class RegisterPage extends BasePage {
     await this.roleSelect.selectOption(user.role ?? 'admin');
     await this.passwordInput.fill(user.password);
     await this.passwordConfirmationInput.fill(user.passwordConfirmation ?? user.password);
-    await this.submitButton.click();
+    await clickReliably(this.submitButton);
   }
 }

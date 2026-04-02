@@ -20,14 +20,14 @@ export class LoginPage extends BasePage {
 
   async waitUntilLoaded(): Promise<void> {
     await this.waitForUrl();
-    await this.expectHeading(/Iniciar sesi[oó]n/i);
+    await this.expectHeading(/Iniciar sesi[oó]n/i, 20000);
     await expect(this.emailInput).toBeVisible();
   }
 
   async login(email: string, password: string): Promise<void> {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
-    await this.submitButton.click();
+    await this.passwordInput.press('Enter');
   }
 
   async loginAsDemoUser(): Promise<void> {

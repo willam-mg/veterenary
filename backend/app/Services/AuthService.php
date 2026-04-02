@@ -8,6 +8,11 @@ use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
+    private function issueToken(User $user): string
+    {
+        return $user->createToken('spa-token-' . str()->uuid())->plainTextToken;
+    }
+
     public function register(array $payload): array
     {
         $user = User::create([
@@ -21,7 +26,7 @@ class AuthService
 
         return [
             'user' => $user,
-            'token' => $user->createToken('spa-token')->plainTextToken,
+            'token' => $this->issueToken($user),
         ];
     }
 
@@ -41,11 +46,9 @@ class AuthService
             ]);
         }
 
-        $user->tokens()->delete();
-
         return [
             'user' => $user,
-            'token' => $user->createToken('spa-token')->plainTextToken,
+            'token' => $this->issueToken($user),
         ];
     }
 

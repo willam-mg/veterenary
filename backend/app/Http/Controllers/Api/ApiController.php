@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,5 +40,23 @@ abstract class ApiController extends Controller
                 'has_more_pages' => $paginator->hasMorePages(),
             ],
         ], $message);
+    }
+
+    protected function applyTokenizedLikeSearch(Builder $query, array $columns, string $search): void
+    {
+        $terms = preg_split('/\s+/', trim($search)) ?: [];
+
+        foreach (array_filter($terms) as $term) {
+            $query->where(function (Builder $innerQuery) use ($columns, $term): void {
+                foreach ($columns as $index => $column) {
+                    if ($index === 0) {
+                        $innerQuery->where($column, 'like', "%{$term}%");
+                        continue;
+                    }
+
+                    $innerQuery->orWhere($column, 'like', "%{$term}%");
+                }
+            });
+        }
     }
 }

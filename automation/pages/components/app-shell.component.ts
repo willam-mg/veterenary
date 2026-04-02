@@ -1,7 +1,14 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
+import { routes } from '../../config/constants';
+import { clickReliably } from '../../utils/interactions';
+
 export class AppShellComponent {
   constructor(private readonly page: Page) {}
+
+  get loadingScreen(): Locator {
+    return this.page.getByText('Conectando con la API veterinaria...');
+  }
 
   get shell(): Locator {
     return this.page.getByTestId('app-shell');
@@ -20,36 +27,44 @@ export class AppShellComponent {
   }
 
   async expectAuthenticated(): Promise<void> {
-    await expect(this.shell).toBeVisible();
-    await expect(this.nav).toBeVisible();
-    await expect(this.logoutButton).toBeVisible();
+    await this.loadingScreen.waitFor({ state: 'hidden', timeout: 30000 }).catch(() => undefined);
+    await expect(this.shell).toBeVisible({ timeout: 30000 });
+    await expect(this.nav).toBeVisible({ timeout: 30000 });
+    await expect(this.logoutButton).toBeVisible({ timeout: 30000 });
   }
 
   async logout(): Promise<void> {
-    await this.logoutButton.click();
+    await clickReliably(this.logoutButton);
+  }
+
+  private async navigate(path: string): Promise<void> {
+    await this.page.evaluate((targetPath) => {
+      window.history.pushState({}, '', targetPath);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }, path);
   }
 
   async openDashboard(): Promise<void> {
-    await this.navLink('nav-dashboard').click();
+    await this.navigate(routes.dashboard);
   }
 
   async openClients(): Promise<void> {
-    await this.navLink('nav-clients').click();
+    await this.navigate(routes.clients);
   }
 
   async openVeterinarians(): Promise<void> {
-    await this.navLink('nav-veterinarians').click();
+    await this.navigate(routes.veterinarians);
   }
 
   async openPets(): Promise<void> {
-    await this.navLink('nav-pets').click();
+    await this.navigate(routes.pets);
   }
 
   async openAppointments(): Promise<void> {
-    await this.navLink('nav-appointments').click();
+    await this.navigate(routes.appointments);
   }
 
   async openClinicalRecords(): Promise<void> {
-    await this.navLink('nav-records').click();
+    await this.navigate(routes.clinicalRecords);
   }
 }

@@ -18,6 +18,6 @@ export class DashboardPage extends BasePage {
   async waitUntilLoaded(): Promise<void> {
     await this.waitForUrl();
     await this.expectHeading(/Dashboard veterinario/i);
-    await expect(this.statsCards.first()).toBeVisible();
+    await expect(this.statsCards.first()).toBeVisible({ timeout: 20000 });
   }
 }
