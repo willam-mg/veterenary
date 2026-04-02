@@ -5,9 +5,6 @@ on:
     branches:
       - main
       - develop
-      - 'feature/**'
-      - 'bugfix/**'
-      - 'hotfix/**'
 
   pull_request:
     branches:
@@ -99,4 +96,36 @@ jobs:
           name: test-results-${{ matrix.suite }}
           path: automation/test-results
           if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Generate Allure report
+        if: always()
+        shell: bash
+        run: |
+          if [ -d reports/allure-results ] && [ "$(find reports/allure-results -type f | wc -l)" -gt 0 ]; then
+            npx allure generate reports/allure-results --clean -o reports/allure-report
+          else
+            mkdir -p reports/allure-report
+            cat <<'EOF' > reports/allure-report/index.html
+            <!doctype html>
+            <html lang="en">
+              <head>
+                <meta charset="utf-8" />
+                <title>Allure Report</title>
+              </head>
+              <body>
+                <h1>Allure report was not generated</h1>
+                <p>No Allure results were found for this execution.</p>
+              </body>
+            </html>
+            EOF
+          fi
+
+      - name: Upload static Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-allure-report-${{ matrix.suite }}
+          path: automation/reports/allure-report
+          if-no-files-found: error
           retention-days: 14

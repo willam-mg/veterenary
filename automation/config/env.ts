@@ -46,3 +46,13 @@ export const env = {
   demoUserEmail: readEnv('DEMO_USER_EMAIL', 'admin@vetdemo.test'),
   demoUserPassword: readEnv('DEMO_USER_PASSWORD', 'password'),
 };
+
+const shouldLogResolvedEnvironment =
+  process.env.LOG_TEST_ENVIRONMENT !== 'false' &&
+  (isCiExecution || process.env.LOG_TEST_ENVIRONMENT === 'true');
+
+if (shouldLogResolvedEnvironment) {
+  console.log(
+    `[automation:env] target=${env.targetEnvironment} web=${env.webBaseUrl} api=${env.apiBaseUrl}`
+  );
+}

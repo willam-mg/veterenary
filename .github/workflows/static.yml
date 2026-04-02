@@ -3,7 +3,7 @@ name: Publish Static Allure Report
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ['Automation Full Regression']
+    workflows: ['Automation CI', 'Automation Full Regression']
     types: [completed]
 
 permissions:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   deploy-pages:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -25,7 +25,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_run' }}
         uses: actions/download-artifact@v4
         with:
-          name: static-allure-report
+          name: ${{ github.event.workflow.name == 'Automation CI' && 'static-allure-report-smoke' || 'static-allure-report' }}
           path: ./site
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
@@ -39,8 +39,20 @@ jobs:
         shell: bash
         run: |
           if [ ! -f automation/reports/allure-report/index.html ]; then
-            echo "Expected file not found: automation/reports/allure-report/index.html"
-            exit 1
+            mkdir -p automation/reports/allure-report
+            cat <<'EOF' > automation/reports/allure-report/index.html
+            <!doctype html>
+            <html lang="en">
+              <head>
+                <meta charset="utf-8" />
+                <title>Allure Report</title>
+              </head>
+              <body>
+                <h1>Allure report was not generated</h1>
+                <p>No local Allure report was found for manual publishing.</p>
+              </body>
+            </html>
+            EOF
           fi
           mkdir -p site
           cp -R automation/reports/allure-report/. site/
