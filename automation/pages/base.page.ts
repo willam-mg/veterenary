@@ -25,8 +25,8 @@ export abstract class BasePage {
     await this.page.waitForURL(`**${this.path}`);
   }
 
-  protected async expectHeading(name: string | RegExp): Promise<void> {
-    await expect(this.page.getByRole('heading', { name })).toBeVisible();
+  protected async expectHeading(name: string | RegExp, timeout = 5000): Promise<void> {
+    await expect(this.page.getByRole('heading', { name })).toBeVisible({ timeout });
   }
 
   protected messageByClass(cssClass: string): Locator {

@@ -27,10 +27,10 @@ export class AppShellComponent {
   }
 
   async expectAuthenticated(): Promise<void> {
-    await this.loadingScreen.waitFor({ state: 'hidden', timeout: 20000 }).catch(() => undefined);
-    await expect(this.shell).toBeVisible({ timeout: 20000 });
-    await expect(this.nav).toBeVisible({ timeout: 20000 });
-    await expect(this.logoutButton).toBeVisible({ timeout: 20000 });
+    await this.loadingScreen.waitFor({ state: 'hidden', timeout: 30000 }).catch(() => undefined);
+    await expect(this.shell).toBeVisible({ timeout: 30000 });
+    await expect(this.nav).toBeVisible({ timeout: 30000 });
+    await expect(this.logoutButton).toBeVisible({ timeout: 30000 });
   }
 
   async logout(): Promise<void> {

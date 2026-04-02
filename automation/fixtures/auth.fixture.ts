@@ -15,7 +15,7 @@ export const test = base.extend<AuthFixture>({
         window.localStorage.setItem('vet-demo-token', token);
       }, session.token);
 
-      await page.goto(env.webBaseUrl);
+      await page.goto(env.webBaseUrl, { waitUntil: 'networkidle' });
       await appShell.expectAuthenticated();
       await use(undefined);
     },
