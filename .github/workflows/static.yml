@@ -21,41 +21,60 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Download Allure report artifact from automation workflow
+      - name: Download Allure report artifacts from automation workflow
         if: ${{ github.event_name == 'workflow_run' }}
         uses: actions/download-artifact@v4
         with:
-          name: ${{ github.event.workflow.name == 'Automation CI' && 'static-allure-report-smoke' || 'static-allure-report' }}
-          path: ./site
+          pattern: static-allure-report*
+          merge-multiple: false
+          path: ./downloaded-artifacts
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
 
-      - name: Checkout repository for manual publishing
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: actions/checkout@v5
+      - name: Prepare site from downloaded artifact
+        if: ${{ github.event_name == 'workflow_run' }}
+        shell: bash
+        run: |
+          mkdir -p site
+          report_dir="$(find downloaded-artifacts -type f -name index.html -path '*/static-allure-report*/*' -exec dirname {} \; | head -n 1)"
 
-      - name: Copy local report for manual publishing
+          if [ -n "$report_dir" ] && [ -f "$report_dir/index.html" ]; then
+            cp -R "$report_dir"/. site/
+            exit 0
+          fi
+
+          cat <<'EOF' > site/index.html
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <title>Allure Report</title>
+            </head>
+            <body>
+              <h1>Allure report artifact not found</h1>
+              <p>No static Allure artifact was available for workflow run ${{ github.event.workflow_run.id }}.</p>
+            </body>
+          </html>
+          EOF
+
+      - name: Prepare placeholder site for manual publishing
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
         run: |
-          if [ ! -f automation/reports/allure-report/index.html ]; then
-            mkdir -p automation/reports/allure-report
-            cat <<'EOF' > automation/reports/allure-report/index.html
-            <!doctype html>
-            <html lang="en">
-              <head>
-                <meta charset="utf-8" />
-                <title>Allure Report</title>
-              </head>
-              <body>
-                <h1>Allure report was not generated</h1>
-                <p>No local Allure report was found for manual publishing.</p>
-              </body>
-            </html>
-            EOF
-          fi
           mkdir -p site
-          cp -R automation/reports/allure-report/. site/
+          cat <<'EOF' > site/index.html
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <title>Allure Report</title>
+            </head>
+            <body>
+              <h1>Manual publish placeholder</h1>
+              <p>Run the automation workflow first so this job can publish a generated Allure artifact.</p>
+            </body>
+          </html>
+          EOF
 
       - name: Validate site content
         shell: bash
