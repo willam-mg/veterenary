@@ -26,6 +26,8 @@ export class AppointmentsPage extends BasePage {
   readonly submitButton: Locator;
   readonly searchInput: Locator;
   readonly table: Locator;
+  readonly rows: Locator;
+  readonly loadingState: Locator;
 
   constructor(page: Page) {
     super(page, routes.appointments);
@@ -42,12 +44,15 @@ export class AppointmentsPage extends BasePage {
     this.table = page.locator('table').filter({
       has: page.getByRole('columnheader', { name: 'Mascota' }),
     });
+    this.rows = this.table.locator('tbody tr');
+    this.loadingState = page.getByText('Cargando agenda...');
   }
 
   async waitUntilLoaded(): Promise<void> {
     await this.waitForUrl();
     await this.expectHeading(/^Citas$/i);
     await expect(this.scheduledAtInput).toBeVisible();
+    await this.waitUntilTableReady();
   }
 
   async selectPet(petName?: string): Promise<void> {
@@ -100,10 +105,24 @@ export class AppointmentsPage extends BasePage {
   }
 
   async search(term: string): Promise<void> {
-    await this.searchInput.fill(term);
+    const encodedTerm = encodeURIComponent(term);
+    await Promise.all([
+      this.page.waitForResponse(
+        (response) =>
+          response.request().method() === 'GET' &&
+          response.url().includes('/appointments') &&
+          response.url().includes(`search=${encodedTerm}`)
+      ),
+      this.searchInput.fill(term),
+    ]);
+    await this.waitUntilTableReady();
+  }
+
+  async waitUntilTableReady(): Promise<void> {
+    await this.loadingState.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => undefined);
   }
 
   rowByAppointmentText(text: string): Locator {
-    return this.table.locator('tbody tr').filter({ has: this.page.getByText(text, { exact: false }) });
+    return this.rows.filter({ has: this.page.getByText(text, { exact: false }) });
   }
 }

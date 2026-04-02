@@ -27,7 +27,9 @@ class ClientController extends ApiController
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(function ($innerQuery) use ($search): void {
                     $innerQuery
-                        ->where('first_name', 'like', "%{$search}%")
+                        ->where(function ($nameQuery) use ($search): void {
+                            $this->applyTokenizedLikeSearch($nameQuery, ['first_name', 'last_name'], $search);
+                        })
                         ->orWhere('last_name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
                         ->orWhere('phone', 'like', "%{$search}%")

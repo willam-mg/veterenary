@@ -2,7 +2,11 @@ import { test as base } from './test.fixture';
 
 import { env } from '../config/env';
 
-export const test = base.extend({
+type AuthFixture = {
+  authenticated: void;
+};
+
+export const test = base.extend<AuthFixture>({
   authenticated: [
     async ({ page, loginPage, appShell }, use) => {
       await loginPage.goto();

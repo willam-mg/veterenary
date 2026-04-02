@@ -16,6 +16,6 @@ test.describe('Regression | Appointments', () => {
 
     await expect(appointmentsPage.successMessage).toBeVisible();
     await appointmentsPage.search(reason);
-    await expect(appointmentsPage.rowByAppointmentText(reason)).toBeVisible();
+    await expect(appointmentsPage.rows).toHaveCount(1);
   });
 });

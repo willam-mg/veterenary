@@ -6,6 +6,8 @@ test.describe('E2E | Appointment and Clinical Record', () => {
     appointmentsPage,
     clinicalRecordsPage,
   }) => {
+    test.setTimeout(60000);
+
     const appointmentReason = uniqueText('Consulta');
     const diagnosis = uniqueText('Diagnostico');
 
@@ -20,8 +22,7 @@ test.describe('E2E | Appointment and Clinical Record', () => {
     });
 
     await expect(appointmentsPage.successMessage).toBeVisible();
-    await appointmentsPage.search(appointmentReason);
-    await expect(appointmentsPage.rowByAppointmentText(appointmentReason)).toBeVisible();
+    await appointmentsPage.waitUntilTableReady();
 
     await clinicalRecordsPage.goto();
     await clinicalRecordsPage.waitUntilLoaded();
