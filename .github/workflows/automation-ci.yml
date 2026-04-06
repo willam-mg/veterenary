@@ -93,7 +93,7 @@ jobs:
         if: matrix.suite != 'api'
         shell: bash
         run: |
-          cat <<EOF > frontend/public/runtime-config.js
+          cat <<EOF > ../frontend/public/runtime-config.js
           window.__vetClinicRuntimeConfig = {
             apiBaseUrl: '${STAGING_API_BASE_URL}',
           };
@@ -232,7 +232,7 @@ jobs:
         if: env.SELECTED_SUITE != 'api'
         shell: bash
         run: |
-          cat <<EOF > frontend/public/runtime-config.js
+          cat <<EOF > ../frontend/public/runtime-config.js
           window.__vetClinicRuntimeConfig = {
             apiBaseUrl: '${STAGING_API_BASE_URL}',
           };
