@@ -162,19 +162,18 @@ jobs:
             npx allure generate reports/allure-results --clean -o reports/allure-report
           else
             mkdir -p reports/allure-report
-            cat <<'EOF' > reports/allure-report/index.html
-            <!doctype html>
-            <html lang="en">
-              <head>
-                <meta charset="utf-8" />
-                <title>Allure Report</title>
-              </head>
-              <body>
-                <h1>Allure report was not generated</h1>
-                <p>No Allure results were found for this execution.</p>
-              </body>
-            </html>
-            EOF
+            printf '%s\n' \
+              '<!doctype html>' \
+              '<html lang="en">' \
+              '  <head>' \
+              '    <meta charset="utf-8" />' \
+              '    <title>Allure Report</title>' \
+              '  </head>' \
+              '  <body>' \
+              '    <h1>Allure report was not generated</h1>' \
+              '    <p>No Allure results were found for this execution.</p>' \
+              '  </body>' \
+              '</html>' > reports/allure-report/index.html
           fi
 
       - name: Upload static Allure report
@@ -325,19 +324,18 @@ jobs:
             npx allure generate reports/allure-results --clean -o reports/allure-report
           else
             mkdir -p reports/allure-report
-            cat <<'EOF' > reports/allure-report/index.html
-            <!doctype html>
-            <html lang="en">
-              <head>
-                <meta charset="utf-8" />
-                <title>Allure Report</title>
-              </head>
-              <body>
-                <h1>Allure report was not generated</h1>
-                <p>No Allure results were found for this execution.</p>
-              </body>
-            </html>
-            EOF
+            printf '%s\n' \
+              '<!doctype html>' \
+              '<html lang="en">' \
+              '  <head>' \
+              '    <meta charset="utf-8" />' \
+              '    <title>Allure Report</title>' \
+              '  </head>' \
+              '  <body>' \
+              '    <h1>Allure report was not generated</h1>' \
+              '    <p>No Allure results were found for this execution.</p>' \
+              '  </body>' \
+              '</html>' > reports/allure-report/index.html
           fi
 
       - name: Upload static Allure report
