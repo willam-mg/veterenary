@@ -3,7 +3,7 @@ name: Publish Static Allure Report
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ['Automation CI', 'Automation Full Regression']
+    workflows: ['Automation CI']
     types: [completed]
 
 permissions:

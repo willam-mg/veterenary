@@ -1,3 +1,5 @@
+import { runtimeConfig } from './runtime-config';
+
 export const apiConfig = {
-  baseUrl: 'http://localhost:8000/api/v1',
+  baseUrl: runtimeConfig.apiBaseUrl,
 };

@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - develop
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
 
   pull_request:
     branches:
@@ -13,9 +16,23 @@ on:
       - master
     paths:
       - 'automation/**'
+      - 'frontend/**'
       - '.github/workflows/automation-ci.yml'
+      - '.github/workflows/static.yml'
+
   workflow_dispatch:
     inputs:
+      suite:
+        description: Suite to run
+        required: true
+        default: all
+        type: choice
+        options:
+          - smoke
+          - api
+          - e2e
+          - regression
+          - all
       target_environment:
         description: Target environment for CI
         required: true
@@ -27,7 +44,8 @@ on:
           - qa
 
 jobs:
-  smoke-and-api:
+  fast-ci:
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
     name: ${{ matrix.suite }} suite - ${{ github.event.inputs.target_environment || 'staging' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -43,7 +61,7 @@ jobs:
     env:
       CI: true
       TEST_ENV: ${{ github.event.inputs.target_environment || 'staging' }}
-      STAGING_WEB_BASE_URL: ${{ vars.STAGING_WEB_BASE_URL || 'https://veterenary-production.up.railway.app' }}
+      WEB_BASE_URL: http://127.0.0.1:4200
       STAGING_API_BASE_URL: ${{ vars.STAGING_API_BASE_URL || 'https://veterenary-production.up.railway.app/api/v1' }}
       PRODUCTION_WEB_BASE_URL: ${{ vars.PRODUCTION_WEB_BASE_URL || '' }}
       PRODUCTION_API_BASE_URL: ${{ vars.PRODUCTION_API_BASE_URL || '' }}
@@ -59,10 +77,48 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: automation/package-lock.json
+          cache-dependency-path: |
+            automation/package-lock.json
+            frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install automation dependencies
         run: npm ci
+
+      - name: Install frontend dependencies
+        if: matrix.suite != 'api'
+        working-directory: frontend
+        run: npm ci
+
+      - name: Configure frontend runtime API
+        if: matrix.suite != 'api'
+        shell: bash
+        run: |
+          cat <<EOF > frontend/public/runtime-config.js
+          window.__vetClinicRuntimeConfig = {
+            apiBaseUrl: '${STAGING_API_BASE_URL}',
+          };
+          EOF
+
+      - name: Start frontend locally
+        if: matrix.suite != 'api'
+        working-directory: frontend
+        shell: bash
+        run: |
+          nohup npm start -- --host 127.0.0.1 --port 4200 > /tmp/vet-frontend.log 2>&1 &
+
+      - name: Wait for frontend
+        if: matrix.suite != 'api'
+        shell: bash
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:4200 > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Frontend did not become ready"
+          cat /tmp/vet-frontend.log || true
+          exit 1
 
       - name: Install Playwright browsers
         if: matrix.suite != 'api'
@@ -126,6 +182,169 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: static-allure-report-${{ matrix.suite }}
+          path: automation/reports/allure-report
+          if-no-files-found: error
+          retention-days: 14
+
+  extended-ci:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    name: ${{ github.event.inputs.suite || 'all' }} suite - ${{ github.event.inputs.target_environment || 'staging' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    defaults:
+      run:
+        working-directory: automation
+
+    env:
+      CI: true
+      TEST_ENV: ${{ github.event.inputs.target_environment || 'staging' }}
+      WEB_BASE_URL: http://127.0.0.1:4200
+      STAGING_API_BASE_URL: ${{ vars.STAGING_API_BASE_URL || 'https://veterenary-production.up.railway.app/api/v1' }}
+      PRODUCTION_WEB_BASE_URL: ${{ vars.PRODUCTION_WEB_BASE_URL || '' }}
+      PRODUCTION_API_BASE_URL: ${{ vars.PRODUCTION_API_BASE_URL || '' }}
+      DEMO_USER_EMAIL: ${{ secrets.DEMO_USER_EMAIL || 'admin@vetdemo.test' }}
+      DEMO_USER_PASSWORD: ${{ secrets.DEMO_USER_PASSWORD || 'password' }}
+      SELECTED_SUITE: ${{ github.event.inputs.suite || 'all' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            automation/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install automation dependencies
+        run: npm ci
+
+      - name: Install frontend dependencies
+        if: env.SELECTED_SUITE != 'api'
+        working-directory: frontend
+        run: npm ci
+
+      - name: Configure frontend runtime API
+        if: env.SELECTED_SUITE != 'api'
+        shell: bash
+        run: |
+          cat <<EOF > frontend/public/runtime-config.js
+          window.__vetClinicRuntimeConfig = {
+            apiBaseUrl: '${STAGING_API_BASE_URL}',
+          };
+          EOF
+
+      - name: Start frontend locally
+        if: env.SELECTED_SUITE != 'api'
+        working-directory: frontend
+        shell: bash
+        run: |
+          nohup npm start -- --host 127.0.0.1 --port 4200 > /tmp/vet-frontend.log 2>&1 &
+
+      - name: Wait for frontend
+        if: env.SELECTED_SUITE != 'api'
+        shell: bash
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:4200 > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Frontend did not become ready"
+          cat /tmp/vet-frontend.log || true
+          exit 1
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run selected suite
+        shell: bash
+        run: |
+          case "$SELECTED_SUITE" in
+            smoke)
+              npm run test:smoke -- --project=chromium
+              ;;
+            api)
+              npm run test:api -- --project=chromium
+              ;;
+            e2e)
+              npm run test:e2e -- --project=chromium
+              ;;
+            regression)
+              npm run test:regression -- --project=chromium
+              ;;
+            all)
+              npm run test:smoke -- --project=chromium
+              npm run test:api -- --project=chromium
+              npm run test:e2e -- --project=chromium
+              npm run test:regression -- --project=chromium
+              ;;
+            *)
+              echo "Unsupported suite: $SELECTED_SUITE"
+              exit 1
+              ;;
+          esac
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-extended
+          path: automation/reports/html-report
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-extended
+          path: automation/reports/allure-results
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-extended
+          path: automation/test-results
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Generate Allure report
+        if: always()
+        shell: bash
+        run: |
+          if [ -d reports/allure-results ] && [ "$(find reports/allure-results -type f | wc -l)" -gt 0 ]; then
+            npx allure generate reports/allure-results --clean -o reports/allure-report
+          else
+            mkdir -p reports/allure-report
+            cat <<'EOF' > reports/allure-report/index.html
+            <!doctype html>
+            <html lang="en">
+              <head>
+                <meta charset="utf-8" />
+                <title>Allure Report</title>
+              </head>
+              <body>
+                <h1>Allure report was not generated</h1>
+                <p>No Allure results were found for this execution.</p>
+              </body>
+            </html>
+            EOF
+          fi
+
+      - name: Upload static Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-allure-report
           path: automation/reports/allure-report
           if-no-files-found: error
           retention-days: 14

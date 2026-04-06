@@ -32,10 +32,10 @@ const selectedEnvironment = environmentCatalog[selectedEnvironmentName];
 const resolvedWebBaseUrl = readEnv('WEB_BASE_URL', selectedEnvironment.webBaseUrl);
 const resolvedApiBaseUrl = readEnv('API_BASE_URL', selectedEnvironment.apiBaseUrl);
 
-if (isCiExecution && (isLocalUrl(resolvedWebBaseUrl) || isLocalUrl(resolvedApiBaseUrl))) {
+if (isCiExecution && isLocalUrl(resolvedApiBaseUrl)) {
   throw new Error(
-    `Invalid CI environment configuration. Resolved WEB_BASE_URL="${resolvedWebBaseUrl}" and API_BASE_URL="${resolvedApiBaseUrl}" point to localhost. ` +
-      'Set TEST_ENV=staging|production or provide explicit non-local WEB_BASE_URL/API_BASE_URL values.'
+    `Invalid CI environment configuration. Resolved API_BASE_URL="${resolvedApiBaseUrl}" points to localhost. ` +
+      'Set TEST_ENV=staging|production or provide an explicit non-local API_BASE_URL value.'
   );
 }
 
