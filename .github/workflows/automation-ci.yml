@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [smoke, api]
+        suite: [smoke, api, e2e, regression]
 
     defaults:
       run:

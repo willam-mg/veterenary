@@ -2,9 +2,6 @@ name: Publish Static Allure Report
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ['Automation CI']
-    types: [completed]
 
 permissions:
   actions: read
@@ -14,51 +11,13 @@ permissions:
 
 jobs:
   deploy-pages:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Download Allure report artifacts from automation workflow
-        if: ${{ github.event_name == 'workflow_run' }}
-        uses: actions/download-artifact@v4
-        with:
-          pattern: static-allure-report*
-          merge-multiple: false
-          path: ./downloaded-artifacts
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ github.token }}
-
-      - name: Prepare site from downloaded artifact
-        if: ${{ github.event_name == 'workflow_run' }}
-        shell: bash
-        run: |
-          mkdir -p site
-          report_dir="$(find downloaded-artifacts -type f -name index.html -path '*/static-allure-report*/*' -exec dirname {} \; | head -n 1)"
-
-          if [ -n "$report_dir" ] && [ -f "$report_dir/index.html" ]; then
-            cp -R "$report_dir"/. site/
-            exit 0
-          fi
-
-          cat <<'EOF' > site/index.html
-          <!doctype html>
-          <html lang="en">
-            <head>
-              <meta charset="utf-8" />
-              <title>Allure Report</title>
-            </head>
-            <body>
-              <h1>Allure report artifact not found</h1>
-              <p>No static Allure artifact was available for workflow run ${{ github.event.workflow_run.id }}.</p>
-            </body>
-          </html>
-          EOF
-
       - name: Prepare placeholder site for manual publishing
-        if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
         run: |
           mkdir -p site
