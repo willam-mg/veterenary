@@ -2,4 +2,4 @@
 cmd = "npm run build"
 
 [deploy]
-cmd = "npx serve dist/vet-clinic-demo/browser -s -l 3000"
+cmd = "npx http-server dist/vet-clinic-demo -p 3000"
